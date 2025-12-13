@@ -11,13 +11,9 @@
 
 Stroke is the second leading cause of death globally. Early identification of patients at higher risk enables preventive interventions and better allocation of healthcare resources.
 
----
-
 ## 🎯 Objective
 
 Build a machine learning model to predict whether a patient is likely to experience a stroke based on demographic, clinical, and lifestyle factors.
-
----
 
 ## 🧾 Dataset Overview
 
@@ -30,8 +26,6 @@ Build a machine learning model to predict whether a patient is likely to experie
 * Target variable: stroke (1 = stroke, 0 = no stroke)
 * Source: Educational healthcare dataset (confidential)
 
----
-
 ## 🛠 Methodology
 
 * Exploratory Data Analysis to assess class imbalance and feature distributions
@@ -43,8 +37,6 @@ Build a machine learning model to predict whether a patient is likely to experie
     * Random Forest
     * XGBoost
 
----
-
 ## 📊 Results
 
 | Model | ROC-AUC | Recall (Stroke) |
@@ -53,23 +45,17 @@ Build a machine learning model to predict whether a patient is likely to experie
 | Random Forest | 0.84 | 0.74 |
 | XGBoost | 0.86 | 0.78 |
 
-----
-
 ## 💡 Key Insights
 
 * Age and average glucose level were the strongest predictors.
 * Severe class imbalance required recall-focused evaluation.
 * Tree-based models outperformed linear baselines.
 
----
-
 ## ⚠️ Limitations & Next Steps
 
 * Dataset size limits generalization
 * No longitudinal patient data
 * Future work: calibration, SHAP explainability
-
----
 
 ## 🧠 Skills Demonstrated
 
