@@ -68,9 +68,8 @@ Cross-validation was used to ensure robust performance.
 | Model | CV RMSE (log) |
 |:-----:|:-------------:|
 | Linear Regression | 0.145 |
-| Ridge Regression | 0.132 |
 | LASSO | 0.129 |
-| ElasticNet | 0.128 |
+| Random Forest | 0.128 |
 | Gradient Boosting | 0.122 |
 | XGBoost | 0.118 | 
 
