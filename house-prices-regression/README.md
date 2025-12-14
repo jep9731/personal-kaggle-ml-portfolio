@@ -54,9 +54,7 @@ Predict the final sale price of homes in Ames, Iowa, using advanced regression t
 4. Modeling
 Models trained and compared:
     * Linear Regression (baseline)
-    * Ridge Regression
     * LASSO Regression
-    * ElasticNet
     * Random Forest Regressor
     * Gradient Boosting Regressor
     * XGBoost Regressor
