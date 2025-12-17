@@ -65,13 +65,13 @@ Cross-validation was used to ensure robust performance.
 
 | Model | CV RMSE (log) |
 |:-----:|:-------------:|
-| Linear Regression | 0.145 |
-| LASSO | 0.129 |
-| Random Forest | 0.128 |
-| Gradient Boosting | 0.122 |
-| XGBoost | 0.118 | 
+| Linear Regression | 0.1697500 |
+| LASSO | 0.1694880 |
+| Random Forest | 0.1698521 |
+| Gradient Boosting | 0.1737498 |
+| XGBoost | 0.1767609 | 
 
-**Best Model:** XGBoost Regressor
+**Best Model:** LASSO Regressor
 
 ## 📤 Kaggle Submission
 
