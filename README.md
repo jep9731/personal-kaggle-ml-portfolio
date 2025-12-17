@@ -37,18 +37,12 @@ kaggle-ml-portfolio/
 │ ├── README.md
 │ ├── data/
 │ ├── notebooks/
-│ │ ├── 01_eda.ipynb
-│ │ ├── 02_feature_engineering.ipynb
-│ │ ├── 03_models.ipynb
-│ │ └── 04_ensemble.ipynb
+│ │ ├── Pasaye_Kaggle_competition.Rmd
 │ ├── submissions/
-│ │ └── submission_v1.csv
+│ │ └── submission.csv
 │ └── results/
+| └── Pasaye_Kaggle_competition.html
 │ └── rmse_scores.csv
-│
-├── shared_utils/ # Optional reusable helpers
-│ ├── metrics.py
-│ └── visualization.py
 │
 ├── requirements.txt
 └── .gitignore
