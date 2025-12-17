@@ -4,6 +4,16 @@ This repository emphasizes **clear problem framing**, **exploratory analysis**, 
 
 ---
 
+## 🚀 Projects Overview
+
+| Project | Domain | Problem Type | Key Skills |
+|:-------:|:-------:|:------------:|:-----------:|
+| Stroke Prediction | Healthcare | Binary Classification | EDA, Imbalanced Data, XGBoost |
+| Symptoms → Disease NLP | Healthcare / NLP | Multi-Class Classification | TF-IDF, NLP, ML Pipelines |
+| House Prices (Kaggle) | Real Estate | Regression | Feature Engineering, Ensembles |
+| Breast Cancer Diagnostic | Healthcare | Binary Classification | Model Evaluation, Scaling |
+| Spotify Analysis | Consumer Analytics | EDA & Visualization | Data Storytelling, Insights |
+
 ## 📂 Repository Structure
 ```
 kaggle-ml-portfolio/
@@ -34,17 +44,40 @@ kaggle-ml-portfolio/
 │ │ └── confusion_matrix.png
 │ │
 │ └── house-prices-regression/
-│ ├── README.md
-│ ├── data/
+│ | ├── README.md
+│ | ├── data/
 | | └── Pasaye_Kaggle_competition.Rmd
 | | └── train.csv
 | | └── test.csv
 │ ├── submissions/
 │ │ └── submission.csv
-│ └── results/
-| └── Pasaye_Kaggle_competition.html
-│ └── rmse_scores.csv
-│
+│ | └── results/
+| | └── Pasaye_Kaggle_competition.html
+│ | └── rmse_scores.csv
+│ |
+| ├── breast-cancer-diagnostic/
+│ │ ├── README.md
+│ │ ├── data/
+│ │ ├── notebooks/
+│ │ │ ├── 01_text_eda.ipynb
+│ │ │ ├── 02_feature_engineering.ipynb
+│ │ │ └── 03_multiclass_models.ipynb
+│ │ └── results/
+│ │ ├── classification_report.txt
+│ │ └── confusion_matrix.png
+| |
+| ├── spotify-analysis/
+│ │ ├── README.md
+│ │ ├── data/
+│ │ ├── notebooks/
+│ │ │ ├── 01_text_eda.ipynb
+│ │ │ ├── 02_feature_engineering.ipynb
+│ │ │ └── 03_multiclass_models.ipynb
+│ │ └── results/
+│ │ ├── classification_report.txt
+│ │ └── confusion_matrix.png
+| |
+| |
 ├── requirements.txt
 └── .gitignore
 ```
@@ -137,3 +170,56 @@ Full technical details, notebooks, results, and evaluations are available inside
 * Demonstrates applied NLP and multi-class classification skills
 
 `📂 projects/symptoms-disease-nlp/`
+
+---
+
+## 🧠 Breast cancer (Healthcare)
+
+**Problem:** Classify breast tumors as **beginin or malignant** cancer.
+
+**Type:** Binary Classification
+
+**Domain:** Healthcare Analytics
+
+**Techniques Used**
+
+* Missing value imputation
+* Categorical encoding
+* Class imbalance handling (class weights)
+* Logistic Regression, Random Forest, XGBoost
+
+**Evaluation Metrics**
+
+* ROC-AUC
+* Recall (classification)
+
+**Highlight**
+
+* Improved classification outcomes using ensemble methods.
+* Strong emphasis on healthcare-relevant evaluation metrics.
+
+`📂 projects/breast-cancer-diagnostic/`
+
+---
+
+## 🎵 Spotify Track Analysis & Visualization
+
+**Problem:**
+
+**Type:** Exploratory Data Analysis & Visualization
+
+**Domain:** Entertainment / Consumer Analytics 
+
+**Techniques Used**
+
+* EDA
+* Data visualization
+* Data storytelling
+
+**Highlight**
+
+* Energy and loudness show strong positive correlation.
+* High-energy tracks tend to score higher in popularity.
+* Genres cluster into distinct audio profiles based on tempo and valence.
+
+`📂 projects/spotify-analysis/`
