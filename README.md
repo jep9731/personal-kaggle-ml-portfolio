@@ -36,7 +36,7 @@ kaggle-ml-portfolio/
 │ └── house-prices-regression/
 │ ├── README.md
 │ ├── data/
-│ ├── notebooks/
+│ ├── script /
 │ │ ├── Pasaye_Kaggle_competition.Rmd
 │ ├── submissions/
 │ │ └── submission.csv
