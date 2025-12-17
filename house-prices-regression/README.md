@@ -91,7 +91,7 @@ Submission files stored in the `submissions/` directory
 
 ## ⚠️ Limitations & Next Steps
 
-* Feature interactions manually engineered
+* Feature interactions could be more data driven
 * Hyperparameter tuning could be further optimized
 * Future work:
     * Stacking / blending models
