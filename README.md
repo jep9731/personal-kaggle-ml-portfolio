@@ -204,7 +204,7 @@ Full technical details, notebooks, results, and evaluations are available inside
 
 ## 🎵 Spotify Track Analysis & Visualization
 
-**Problem:**
+**Problem:** Audio features and metadata relationship, patterns and trends in genres and artist.
 
 **Type:** Exploratory Data Analysis & Visualization
 
