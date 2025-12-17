@@ -1,0 +1,471 @@
+---
+title: "Kaggle Housing Prices Prediction Competition"
+author: "Joshua Pasaye"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+rm(list = ls()) # remove everything from environment
+
+# Load libraries
+library(tidyverse)
+# install.packages("randomForest")
+library(randomForest)
+# install.packages("gbm")
+# install.packages("caret")
+# install.packages("xgboost")
+# install.packages("glmnet")
+# install.packages("corrplot")
+# install.packages("GGally")
+library(gbm)
+library(caret)
+library(xgboost)
+library(glmnet)
+library(Matrix)
+library(corrplot)
+library(GGally)
+```
+
+## Introduction
+
+This R markdown will review my end-to-end process for predicting housing prices in the Kaggle **House Prices - Advanced Regression Techniques** competition. The dataset contains 79 explanatory variables describing (almost) every aspect of residential homes in Ames, Iowa.
+
+**Goal:**
+
+My job to predict the sales price for each house. For each Id in the test set, I must predict the value of the `SalePrice` variable.
+
+**Metric:**
+
+Submissions are evaluated on *Root-Mean-Squared-Error (RMSE)* between the logarithm of the predicted value and the logarithm of the observed sales price.
+
+### Getting Started
+
+First things first, I will need to upload the data. There are two datasets, the test dataset and the training dataset. Since the test dataset will be what I will need to predict, I will only load in the training dataset and do a sanity check to see what I am working with. 
+
+```{r start 1, echo=FALSE}
+# Load dataframe
+df <- read.csv("C:\\Users\\joshp\\OneDrive\\Documents\\Kaggle\\House Price competition\\train.csv") # change path if needed
+
+# Print first 5 rows
+print(head(df))
+```
+
+There looks be a good mix of character variables and numeric variables. Additionally, there seem to be a good amount of missing values in the dataset. These will be handled very soon.
+
+Next, I will look at the each variables data type (i.e., character/string, integer, numeric, logical, etc.) to determine how I will impute missing variables.
+
+```{r start 2, echo=FALSE}
+# Print data types of each column
+str(df)
+```
+
+It looks like all of the variables are either a character/string type of variable or an integer type of variable, which makes it easy to manipulate the dataset before training.
+
+Finally, as an initial sanity check, I will determine the number of missing values each column has. That will determine what/if imputation methods I will employ. 
+
+```{r start 3, echo=FALSE}
+# Print missing values for each column
+print(colSums(is.na(df)))
+```
+
+There are a good amount of missing values throughout the dataset, with the `PoolQC` variable having the highest amount of missing data. To correct for missing values, I will take the *median* value of each numeric variable, and for each character variable, I will put a new category called "None".
+
+## EDA
+
+### Visualizations
+
+First, I will do some visualizations to see if there are any interesting relationships that could be explored further.
+
+```{r eda 1, echo=FALSE}
+# Distribution of SalePrice
+ggplot(df, aes(x = SalePrice)) +
+  geom_histogram(bins = 50, fill = "skyblue", color = "black") +
+  scale_x_continuous(labels = scales::comma) +
+  theme_minimal() +
+  labs(title = "Distribution of SalePrice")
+
+# SalePrice vs. GrLivArea (total above-ground living area)
+ggplot(df, aes(x = GrLivArea, y = SalePrice)) +
+  geom_point(alpha = 0.5, color = "darkgreen") +
+  theme_minimal() +
+  labs(title = "SalePrice vs GrLivArea")
+
+# SalePrice vs. OverallQual (categorical)
+ggplot(df, aes(x = factor(OverallQual), y = SalePrice)) +
+  geom_boxplot(fill = "orange") +
+  theme_minimal() +
+  labs(title = "SalePrice vs Overall Quality", x = "Overall Quality")
+
+# Correlation heatmap of numeric variables
+numeric_cols <- df %>% 
+  select(where(is.numeric)) %>% 
+  names()
+
+corr_matrix <- cor(df[numeric_cols], use = "pairwise.complete.obs")
+corrplot::corrplot(corr_matrix, method = "color", type = "upper", tl.cex = 0.7)
+```
+
+### Statistics
+
+Now, I will look at potential relationships using correlations and other EDA techniques.
+
+```{r eda 2, echo=FALSE, fig.width=10, fig.height=8}
+# Basic summary of numeric variables
+summary(df[numeric_cols])
+
+# Check missing values per column
+missing_summary <- sapply(df, function(x) sum(is.na(x)))
+missing_summary[missing_summary > 0]
+
+# Top correlations with SalePrice
+correlations <- cor(df[numeric_cols], use = "pairwise.complete.obs")
+sort(correlations[, "SalePrice"], decreasing = TRUE)
+
+# Pairwise plots for top 5 correlated numeric features
+top_features <- names(sort(correlations[, "SalePrice"], decreasing = TRUE))[2:6]  # skip SalePrice itself
+GGally::ggpairs(df[, c("SalePrice", top_features)])
+```
+
+Based on the EDA, `SalePrice` is has a very strong positive correlation `OverallQual` (.79) and the `GrLivArea` (.71) variables, which make sense as the higher overall quality of the home and more living room space, can indicate a larger home and higher price. Additionally, other notable variables that had a strong relationship were: `GarageCars` (0.64), `GarageArea` (0.62), `TotalBsmtSF` (.61), `X1stFlrSF` (.61), and `FullBath` (0.56). These variables indicate that larger living space, storage space, and functional amenities drive value, and will be key variables to start with.
+
+## Data Preparation
+
+### Cleaning dataset
+
+Now, I will separate the data into numeric and categorical variables and then impute the missing values. For the numeric columns, I will impute with the missing with the *median* value. For the character columns, we will add a new category called "None".
+
+```{r prep 1, echo=TRUE}
+# Define top variables
+top_vars <- c("OverallQual", "GrLivArea", "GarageCars", 
+              "GarageArea", "TotalBsmtSF", "X1stFlrSF", "FullBath", "SalePrice")
+
+df_top <- df[, top_vars]
+
+
+# Separate numeric columns 
+numeric_cols <- df_top %>%
+  select(where(is.numeric)) %>%
+  select(-SalePrice) %>% # exclude Id & SalePrice
+  names()
+
+# Impute data
+numeric_cols <- setdiff(names(df_top), "SalePrice")
+
+for (col in numeric_cols) {
+  df_top[[col]][is.na(df_top[[col]])] <- median(df_top[[col]], na.rm = TRUE)
+}
+
+# Print final dataset
+print(head(df_top))
+```
+
+We removed all the missing values from the dataset!
+
+### Scale data
+
+It is best practice to scale the data even though most of the models do not require it. I will use **Min/Max scaling** on the `train_train` and the `train_val` datasets. Mix/Max scaling puts all the numeric values between 0 and 1.
+
+```{r prep 3, echo=TRUE}
+# Set up scaling
+bounds <- list()
+
+for (col in numeric_cols) {
+  Q1 <- quantile(df_top[[col]], 0.25)
+  Q3 <- quantile(df_top[[col]], 0.75)
+  IQR_val <- Q3 - Q1
+  lower <- Q1 - 1.5 * IQR_val
+  upper <- Q3 + 1.5 * IQR_val
+  bounds[[col]] <- c(lower = lower, upper = upper)
+  
+  # Truncate
+  df_top[[col]] <- pmin(pmax(df_top[[col]], lower), upper)
+  
+  # Normalize
+  df_top[[paste0("nor_", col)]] <- (df_top[[col]] - lower) / (upper - lower)
+}
+```
+
+### Remove outliers
+
+Finally we will be removing any outliers based on the `SalePrice` target variable.
+
+```{r prep 2, echo=TRUE}
+# Split dataset into test and validations
+set.seed(123)
+train_index <- createDataPartition(df_top$SalePrice, p = 0.8, list = FALSE)
+train_train <- df_top[train_index, ]
+train_val   <- df_top[-train_index, ]
+
+# Prepare predictors & target
+X_train <- train_train[, paste0("nor_", numeric_cols)]
+y_train <- train_train$SalePrice
+X_train_mat <- as.matrix(X_train) # LASSO and XGBoosting
+
+X_val <- train_val[, paste0("nor_", numeric_cols)]
+y_val <- train_val$SalePrice
+X_val_mat <- as.matrix(X_val) # LASSO and XGBoosting
+
+# Log y variables
+y_train_log <- log(y_train)
+y_val_log <- log(y_val)
+``` 
+
+The outliers have been taken care of, we can scale the `train_train` and `train_val` data, which will be used inputted into the models.
+
+Now we are ready to set-up the models!
+
+## Models
+
+With all the data preparation complete, I can begin to set-up the models. I will be comparing the following models to determine which model performed the best:
+
+* `Linear Regression`
+* `LASSO`
+* `Random Forest`
+* `Gradient Boosting`
+* `XGBoosting`
+
+### Linear Regression
+
+The first model we will be looking at is a Linear Regression model. For metrics, I will be looking at the **Root Mean Squared Error (RMSE)**. This value will be compared across models to compare the accuracy of the models. Additionally, I will be plotting a ROC curve.
+
+```{r linear regression, echo=TRUE}
+# Set seed
+set.seed(123)
+
+# Set up control to compare all models
+ctrl <- trainControl(method = "cv", number = 5)
+
+# Fit model
+lm_model <- train(
+  x = X_train,
+  y = y_train_log,
+  method = "lm",
+  trControl = ctrl
+  )
+
+# Predict model
+pred_lm <- predict(lm_model, X_val)
+
+# Metrics
+lm_rmse <- RMSE(pred_lm[!is.na(pred_lm)], y_val_log[!is.na(pred_lm)])
+print(lm_rmse)
+
+# Feature importance
+summary(lm_model)
+```
+
+### LASSO
+
+Next, I will be training and testing the **LASSO regression** model.
+
+```{r lasso, echo=TRUE}
+# Set seed
+set.seed(123)
+
+# Fit model
+cv_lasso <- cv.glmnet(
+  x = X_train_mat,
+  y = y_train_log,
+  alpha = 1,       # alpha = 1 -> LASSO
+  nfolds = 5
+)
+
+# Best lambda
+best_lambda <- cv_lasso$lambda.min
+
+# Fit final model
+lasso_model <- glmnet(
+  x = X_train_mat,
+  y = y_train_log,
+  alpha = 1,
+  lambda = best_lambda
+)
+
+# Predict model
+pred_lasso <- predict(lasso_model, X_val_mat)
+
+# Metrics
+lasso_rmse <- RMSE(pred_lasso, y_val_log)
+print(lasso_rmse)
+
+# Feature importance
+lasso_coefs <- as.matrix(coef(lasso_model))
+print(lasso_coefs)
+```
+
+### Random Forest
+
+Next, I will be training and testing the **Random Forest** model.
+
+```{r RF, echo=TRUE}
+# Set seed
+set.seed(123)
+
+# Fit model
+rf_model <- randomForest(x = X_train, y = y_train_log, ntree = 500)
+
+# Predict model
+rf_pred <- predict(rf_model, X_val)
+
+# Metrics
+rf_rmse <- RMSE(rf_pred, y_val_log)
+print(rf_rmse)
+
+# Plot feature importance
+print(importance(rf_model))
+varImpPlot(rf_model)
+```
+
+### Gradient Boosting
+
+Next, I will be training and testing the **Gradient Boosting** model.
+
+```{r GB, echo=TRUE}
+# Set seed
+set.seed(123)
+
+# Combine X_train and log target
+train_data <- cbind(X_train, SalePrice_log = y_train_log)
+
+# Fit GBM
+gbm_model <- gbm(SalePrice_log ~ ., data = train_data,
+                 distribution = "gaussian",
+                 n.trees = 5000,
+                 interaction.depth = 4,
+                 shrinkage = 0.01,
+                 cv.folds = 5,
+                 n.cores = 1)
+
+# Best iteration
+best_iter <- gbm.perf(gbm_model, method = "cv")
+
+# Predict on validation
+gbm_pred_val <- predict(gbm_model, X_val, n.trees = best_iter)
+gbm_rmse <- RMSE(gbm_pred_val, y_val_log)
+print(gbm_rmse)
+
+# Feature importance
+summary(gbm_model)
+```
+
+### XGBoosting
+
+Next, I will be training and testing the **XGBoosting** model.
+
+```{r XGB, echo=TRUE}
+# Set seed
+set.seed(123)
+
+# Fit model
+xgb_model <- xgboost(
+  x = X_train_mat,
+  y = y_train_log,
+  nrounds = 500,
+  max_depth = 4,
+  learning_rate = 0.05,
+  objective = "reg:squarederror"
+)
+
+# Predict model
+xgb_pred <- predict(xgb_model, X_val_mat)
+
+# Metrics
+xgb_rmse <- RMSE(xgb_pred, y_val_log)
+print(xgb_rmse)
+
+# Plot feature importance
+importance <- xgb.importance(feature_names = colnames(X_train_mat), model = xgb_model)
+xgb.plot.importance(importance_matrix = importance)
+```
+
+## Conclusion
+
+Now, I will compare all the RMSE's from each model to determine which one was the most accurate. Additionally, I will be using the test dataset for final analysis and prepare my submission to the Kaggle competition.
+
+```{r final, echo=TRUE}
+# Compare RMSEs
+results <- data.frame(
+  Model = c("Linear Regression", "LASSO", "Random Forest", "Gradient Boosting", "XGBoost"),
+  RMSE  = c(lm_rmse, lasso_rmse, rf_rmse, gbm_rmse, xgb_rmse)
+)
+
+# Print results
+print(results)
+
+# Output RMSE
+write.csv(results, "rmse_scores.csv")
+```
+
+Based on the RMSE scores, **LASSO** was the best model with .1740, closely followed by **Linear Regression** with .1770 RMSE score. This indicates that **LASSO** had the closest to the true value of `SalePrice` and had the highest accuracy. 
+
+## Submission
+
+Now, I will prepare the submission to the Kaggle competition using **LASSO**. To prevent any data leakage, I will use the same preprocessing methods for the training dataset.
+
+```{r submission, echo=TRUE}
+# Set seed
+set.seed(123)
+
+# Load test dataset
+test_df <- read.csv("C:\\Users\\joshp\\OneDrive\\Documents\\Kaggle\\House Price competition\\test.csv")
+
+# Keep only top numeric variables
+numeric_cols <- c("OverallQual", "GrLivArea", "GarageCars", 
+                  "GarageArea", "TotalBsmtSF", "X1stFlrSF", "FullBath")
+
+test_df_top <- test_df[, numeric_cols]
+
+# Impute missing values using training medians
+for(col in numeric_cols){
+  median_val <- median(df_top[[col]], na.rm = TRUE)
+  test_df_top[[col]][is.na(test_df_top[[col]])] <- median_val
+}
+
+# Truncate using training bounds
+for(col in numeric_cols){
+  lower <- bounds[[col]]["lower"]
+  upper <- bounds[[col]]["upper"]
+  
+  # If bounds are NA (or NULL), replace with min/max from training data
+  if(is.na(lower)) lower <- min(df_top[[col]], na.rm = TRUE)
+  if(is.na(upper)) upper <- max(df_top[[col]], na.rm = TRUE)
+  
+  # Make lower bound realistic for counts
+  if(!is.na(lower) && lower < 0) lower <- 0
+  
+  # Truncate
+  test_df_top[[col]] <- pmin(pmax(test_df_top[[col]], lower), upper)
+}
+
+# Normalize
+for(col in numeric_cols){
+  lower <- bounds[[col]]["lower"]
+  upper <- bounds[[col]]["upper"]
+  
+  # fallback if NA
+  if(is.na(lower)) lower <- min(df_top[[col]], na.rm = TRUE)
+  if(is.na(upper)) upper <- max(df_top[[col]], na.rm = TRUE)
+  
+  range_val <- upper - lower
+  test_df_top[[paste0("nor_", col)]] <- (test_df_top[[col]] - lower) / range_val
+}
+
+# Keep only normalized columns for prediction
+X_test <- test_df_top[, paste0("nor_", numeric_cols)]
+X_test_mat <- as.matrix(X_test)
+
+# GBM test
+pred_test_log <- predict(lasso_model, newx = X_test_mat)
+pred_test <- exp(pred_test_log)
+
+# Create Kaggle submission
+submission <- data.frame(
+  Id = test_df$Id,
+  SalePrice = pred_test
+)
+
+write.csv(submission, "submission.csv", row.names = FALSE)
+```
