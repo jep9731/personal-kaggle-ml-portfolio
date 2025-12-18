@@ -29,7 +29,7 @@ Build a machine learning model to predict whether a patient is likely to experie
 ## 🛠 Methodology
 
 * Exploratory Data Analysis to assess class imbalance and feature distributions
-* Missing value imputation for BMI and smoking status
+* Missing value imputation for BMI
 * One-hot encoding for categorical variables
 * Addressed class imbalance using class weighting
 * Models trained and evaluated:
