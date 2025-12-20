@@ -188,13 +188,15 @@ Full technical details, notebooks, results, and evaluations are available inside
 
 * Missing value imputation
 * Categorical encoding
-* Class imbalance handling (class weights)
+* Class imbalance handling (SMOTE)
+* Variable reduction using Principal Component Analysis (PCA)
 * Logistic Regression, Random Forest, XGBoost
 
 **Evaluation Metrics**
 
 * ROC-AUC
 * Recall (classification)
+* Confusion matrix
 
 **Highlight**
 
