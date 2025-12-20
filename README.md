@@ -34,7 +34,7 @@ kaggle-ml-portfolio/
 | | | ├── xgb_roc.png
 | | | ├── model_comparisons_roc.png
 │ │ └── requirements/
-| | | ├── requirements.txt
+| | | └── requirements.txt
 │ │
 │ ├── symptoms-disease-nlp/
 │ │ ├── README.md
@@ -44,20 +44,20 @@ kaggle-ml-portfolio/
 │ │ │ ├── 02_feature_engineering.ipynb
 │ │ │ └── 03_multiclass_models.ipynb
 │ │ └── results/
-│ │ ├── classification_report.txt
-│ │ └── confusion_matrix.png
+│ │ | ├── classification_report.txt
+│ │ | └── confusion_matrix.png
 │ │
 │ └── house-prices-regression/
 │ | ├── README.md
 │ | ├── data/
-| | └── Pasaye_Kaggle_competition.Rmd
-| | └── train.csv
-| | └── test.csv
-│ ├── submissions/
-│ │ └── submission.csv
+| | | └── Pasaye_Kaggle_competition.Rmd
+| | | └── train.csv
+| | | └── test.csv
+│ | ├── submissions/
+│ │ | └── submission.csv
 │ | └── results/
-| | └── Pasaye_Kaggle_competition.html
-│ | └── rmse_scores.csv
+| | | └── Pasaye_Kaggle_competition.html
+│ | | └── rmse_scores.csv
 │ |
 | ├── breast-cancer-diagnostic/
 │ │ ├── README.md
@@ -78,11 +78,10 @@ kaggle-ml-portfolio/
 │ │ │ ├── 02_feature_engineering.ipynb
 │ │ │ └── 03_multiclass_models.ipynb
 │ │ └── results/
-│ │ ├── classification_report.txt
-│ │ └── confusion_matrix.png
+│ │ | ├── classification_report.txt
+│ │ | └── confusion_matrix.png
 | |
 | |
-├── requirements.txt
 └── .gitignore
 ```
 
