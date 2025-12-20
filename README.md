@@ -16,7 +16,7 @@ This repository emphasizes **clear problem framing**, **exploratory analysis**, 
 
 ## 📂 Repository Structure
 ```
-kaggle-ml-portfolio/
+personal-kaggle-ml-portfolio/
 │
 ├── README.md # Main portfolio landing page
 │
