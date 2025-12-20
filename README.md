@@ -141,7 +141,7 @@ Full technical details, notebooks, results, and evaluations are available inside
 
 **Highlight**
 
-* Improved minority-class recall using ensemble methods.
+* Improved minority-class recall using logistic methods.
 * Strong emphasis on healthcare-relevant evaluation metrics.
 
 `📂 projects/stroke-prediction/`
