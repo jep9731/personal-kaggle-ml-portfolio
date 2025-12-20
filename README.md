@@ -178,7 +178,7 @@ Full technical details, notebooks, results, and evaluations are available inside
 
 ## 🧠 Breast cancer (Healthcare)
 
-**Problem:** Classify breast tumors as **beginin or malignant** cancer.
+**Problem:** Classify breast tumors as **bengin or malignant** cancer.
 
 **Type:** Binary Classification
 
