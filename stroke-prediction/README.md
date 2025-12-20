@@ -41,21 +41,25 @@ Build a machine learning model to predict whether a patient is likely to experie
 
 | Model | ROC-AUC | Recall (Stroke) |
 |:-----:|:-------:|:---------------:|
-|Logistic Regression | 0.82 | 0.71 |
-| Random Forest | 0.84 | 0.74 |
-| XGBoost | 0.86 | 0.78 |
+|Logistic Regression | 0.86 | 0.95 |
+| Random Forest | 0.78 | 0.36 |
+| XGBoost | 0.82 | 0.40 |
+
+**Logistic Regression** performed the best in predicting stroke.
 
 ## 💡 Key Insights
 
 * Age and average glucose level were the strongest predictors.
 * Severe class imbalance required recall-focused evaluation.
-* Tree-based models outperformed linear baselines.
+* Linear baseline outperformed tree-based models.
 
 ## ⚠️ Limitations & Next Steps
 
-* Dataset size limits generalization
-* No longitudinal patient data
-* Future work: calibration, SHAP explainability
+* Dataset size limits generalization.
+* No longitudinal patient data.
+* Future work:
+   * Calibration
+   * SHAP explainability
 
 ## 🧠 Skills Demonstrated
 
