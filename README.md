@@ -24,13 +24,17 @@ kaggle-ml-portfolio/
 │ ├── stroke-prediction/
 │ │ ├── README.md # Project summary
 │ │ ├── data/ # Dataset
-│ │ ├── notebooks/
-│ │ │ ├── 01_eda.ipynb
-│ │ │ ├── 02_preprocessing.ipynb
-│ │ │ └── 03_modeling.ipynb
+│ │ │ ├── stroke_prediction.R
+│ │ │ ├── healthcare-dataset-stroke-data.csv
 │ │ └── results/
-│ │ ├── metrics.json
+│ │ | ├── results.csv
 │ │ └── figures/
+| | | ├── logistic_roc.png
+| | | ├── rf_roc.png
+| | | ├── xgb_roc.png
+| | | ├── model_comparisons_roc.png
+│ │ └── requirements/
+| | | ├── requirements.txt
 │ │
 │ ├── symptoms-disease-nlp/
 │ │ ├── README.md
