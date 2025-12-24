@@ -1,0 +1,16 @@
+# Data manipulation
+tidyverse
+
+# Data splitting and preprocessing
+caret
+
+# Modeling
+randomForest
+e1071
+
+# Metrics and evaluation
+pROC
+janitor
+GGally
+Metrics
+corrplot
