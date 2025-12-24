@@ -43,16 +43,16 @@ Develop and evaluate classification models that accurately predict whether a bre
 ## 📊 Results
 | Model | Accuracy | ROC-AUC |
 |------|----------|---------|
-| Logistic Regression | 0.96 | 0.98 |
-| SVM | 0.96 | 0.98 |
-| Random Forest | **0.97** | **0.99** |
+| Logistic Regression | **0.965** | 0.975 |
+| SVM | 0.894 | **0.998** |
+| Random Forest | **0.965** | **0.998** |
 
 ---
 
 ## 💡 Key Insights
 - Mean radius, concavity, and texture features were highly predictive
 - Proper feature scaling significantly improved linear model performance
-- Ensemble models achieved the strongest overall results
+- Ensemble models (i.e. **Random Forest**) achieved the strongest overall results
 
 ---
 
