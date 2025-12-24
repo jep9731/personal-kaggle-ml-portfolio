@@ -34,7 +34,7 @@ personal-kaggle-ml-portfolio/
 | | | ├── xgb_roc.png
 | | | ├── model_comparisons_roc.png
 │ │ └── requirements/
-| | | └── requirements.txt
+| |   └── requirements.txt
 │ │
 │ ├── symptoms-disease-nlp/
 │ │ ├── README.md
@@ -44,8 +44,8 @@ personal-kaggle-ml-portfolio/
 │ │ │ ├── 02_feature_engineering.ipynb
 │ │ │ └── 03_multiclass_models.ipynb
 │ │ └── results/
-│ │ | ├── classification_report.txt
-│ │ | └── confusion_matrix.png
+│ │   ├── classification_report.txt
+│ │   └── confusion_matrix.png
 │ │
 │ └── house-prices-regression/
 │ | ├── README.md
@@ -56,8 +56,8 @@ personal-kaggle-ml-portfolio/
 │ | ├── submissions/
 │ │ | └── submission.csv
 │ | └── results/
-| | | └── Pasaye_Kaggle_competition.html
-│ | | └── rmse_scores.csv
+| |   └── Pasaye_Kaggle_competition.html
+│ |   └── rmse_scores.csv
 │ |
 | ├── breast-cancer-diagnostic/
 │ │ ├── README.md
@@ -74,7 +74,9 @@ personal-kaggle-ml-portfolio/
 | | | ├── model_comparisons.png
 │ │ └── results/
 │ │ | ├── results.csv
-| |
+| | └── requirements/
+| |   └── requirements.txt
+| | 
 | ├── spotify-analysis/
 │ │ ├── README.md
 │ │ ├── data/
@@ -83,8 +85,8 @@ personal-kaggle-ml-portfolio/
 │ │ │ ├── 02_feature_engineering.ipynb
 │ │ │ └── 03_multiclass_models.ipynb
 │ │ └── results/
-│ │ | ├── classification_report.txt
-│ │ | └── confusion_matrix.png
+│ │   ├── classification_report.txt
+│ │   └── confusion_matrix.png
 | |
 | |
 └── .gitignore
