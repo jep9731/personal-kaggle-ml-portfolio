@@ -62,13 +62,18 @@ personal-kaggle-ml-portfolio/
 | ├── breast-cancer-diagnostic/
 │ │ ├── README.md
 │ │ ├── data/
-│ │ ├── notebooks/
-│ │ │ ├── 01_text_eda.ipynb
-│ │ │ ├── 02_feature_engineering.ipynb
-│ │ │ └── 03_multiclass_models.ipynb
+│ │ │ ├── breast_cancer_prediction.Rmd
+│ │ │ ├── breast_cancer.csv
+│ │ └── figures/
+| | | ├── log_roc.png
+| | | ├── log_confusion_matrix.png
+| | | ├── svm_roc.png
+| | | ├── svm_confusion_matrix.png
+| | | ├── rf_roc.png
+| | | ├── rf_confusion_matrxi.png
+| | | ├── model_comparisons.png
 │ │ └── results/
-│ │ ├── classification_report.txt
-│ │ └── confusion_matrix.png
+│ │ | ├── results.csv
 | |
 | ├── spotify-analysis/
 │ │ ├── README.md
