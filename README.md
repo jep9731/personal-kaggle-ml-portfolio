@@ -249,3 +249,32 @@ Full technical details, notebooks, results, and evaluations are available inside
 * Genres cluster into distinct audio profiles based on tempo and valence.
 
 `📂 projects/spotify-analysis/`
+
+---
+
+## 🎓 Exam Score Prediction – Student Performance Analytics (Kaggle)
+
+**Problem:** Predict student exam scores based on academic behavior, lifestyle habits, and learning environment factors
+
+**Type:** Regression
+
+**Domain:** Education Analytics / Behavioral Data Science
+
+**Techniques Used**
+
+* Exploratory data analysis on academic, behavioral, and lifestyle variables.
+* Feature engineering (study habits, sleep patterns, attendance, exam conditions).
+* Handling mixed data types (categorical + numerical features).
+* Regression models (Linear Regression, Random Forest, Gradient Boosting, XGBoost).
+* Model interpretation and feature importance analysis.
+
+**Evaluation Metric**
+
+* RMSE on exam score (0–100 scale)
+
+**Highlight**
+
+* Captures realistic, multi-factor influences on academic performance.
+* Demonstrates end-to-end regression workflow with interpretable insights into student success drivers.
+
+`📂 projects/exam-score-prediction/`
