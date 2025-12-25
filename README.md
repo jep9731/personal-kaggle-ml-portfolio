@@ -13,6 +13,7 @@ This repository emphasizes **clear problem framing**, **exploratory analysis**, 
 | House Prices (Kaggle) | Real Estate | Regression | Feature Engineering, Ensembles |
 | Breast Cancer Diagnostic | Healthcare | Binary Classification | Model Evaluation, Scaling |
 | Spotify Analysis | Consumer Analytics | EDA & Visualization | Data Storytelling, Insights |
+| Exam Score Prediction (Kaggle) | Education / Analytics | Regression | EDA, Feature Engineering, Model Interpretation |
 
 ## 📂 Repository Structure
 ```
@@ -88,6 +89,19 @@ personal-kaggle-ml-portfolio/
 │ │   ├── classification_report.txt
 │ │   └── confusion_matrix.png
 | |
+| ├── exam-score-prediction/
+│ │ ├── README.md
+│ │ ├── data/
+│ │ │ ├── breast_cancer_prediction.Rmd
+│ │ │ ├── Exam_Score_Prediction.csv
+│ │ └── figures/
+| | | ├── log_roc.png
+| | | ├── log_confusion_matrix.png
+| | | ├── model_comparisons.png
+│ │ └── results/
+│ │ | ├── results.csv
+| | └── requirements/
+| |   └── requirements.txt
 | |
 └── .gitignore
 ```
