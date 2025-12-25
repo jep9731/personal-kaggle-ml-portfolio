@@ -76,3 +76,19 @@ RMSE was chosen to penalize larger prediction errors and maintain interpretabili
 - Reveals the relative importance of **study habits, sleep, and attendance**.
 - Emphasizes interpretability alongside predictive performance.
 - Suitable for education-focused analytics and behavioral ML applications.
+
+---
+
+### 🚀 Future Improvements
+
+- Add SHAP-based explainability for individual predictions
+- Experiment with neural networks for nonlinear patterns
+- Perform subgroup analysis (e.g., attendance tiers, sleep quality buckets)
+- Hyperparameter tuning for ensemble models
+
+---
+
+### 📎 Notes
+
+This project is intended for educational and analytical purposes.  
+All results are reproducible using the provided notebooks.
