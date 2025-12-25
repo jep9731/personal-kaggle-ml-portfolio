@@ -1,6 +1,6 @@
 # 🎓 Exam Score Prediction – Student Performance Analytics
 
-## 📌 Project Overview
+### 📌 Project Overview
 
 This project analyzes and predicts student exam scores based on a wide range of academic, behavioral, lifestyle, and environmental factors.  
 The goal is to understand **what drives academic performance** and build regression models that can accurately estimate exam outcomes on a 0–100 scale.
@@ -9,7 +9,7 @@ The dataset is designed to mimic real-world educational settings, making this pr
 
 ---
 
-## 🧠 Problem Statement
+### 🧠 Problem Statement
 
 **Predict:**  
 * A student’s final exam score (0–100)
@@ -22,7 +22,7 @@ The dataset is designed to mimic real-world educational settings, making this pr
 
 ---
 
-## 📊 Dataset Description
+### 📊 Dataset Description
 
 - **Source:** Kaggle – *Exam Score Prediction Dataset*
 - **Size:** 20,000 student records
@@ -38,31 +38,31 @@ The target score is generated using a weighted formula that reflects realistic a
 
 ---
 
-## 🔧 Techniques Used
+### 🔧 Techniques Used
 
-### Exploratory Data Analysis (EDA)
+#### Exploratory Data Analysis (EDA)
 - Distribution analysis of exam scores
 - Correlation analysis between lifestyle, academic, and environmental factors
 - Identification of key performance drivers
 
-### Feature Engineering
+#### Feature Engineering
 - Encoding categorical variables
 - Aggregating and transforming behavioral indicators
 - Scaling numerical features where appropriate
 
-### Modeling
+#### Modeling
 - Linear Regression (baseline)
 - Random Forest Regressor
 - Gradient Boosting Regressor
 - XGBoost Regressor
 
-### Model Interpretation
+#### Model Interpretation
 - Feature importance analysis
 - Comparison of academic vs lifestyle influence on performance
 
 ---
 
-## 📏 Evaluation Metric
+### 📏 Evaluation Metric
 
 - **RMSE (Root Mean Squared Error)** on predicted exam scores
 
@@ -70,7 +70,7 @@ RMSE was chosen to penalize larger prediction errors and maintain interpretabili
 
 ---
 
-## ⭐ Key Highlights
+### ⭐ Key Highlights
 
 - Demonstrates a full **end-to-end regression pipeline** on mixed-type data.
 - Reveals the relative importance of **study habits, sleep, and attendance**.
