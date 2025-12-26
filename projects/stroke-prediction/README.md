@@ -41,7 +41,7 @@ Build a machine learning model to predict whether a patient is likely to experie
 
 | Model | ROC-AUC | Recall (Stroke) |
 |:-----:|:-------:|:---------------:|
-|Logistic Regression | 0.86 | 0.95 |
+|Logistic Regression | **0.86** | **0.95** |
 | Random Forest | 0.78 | 0.36 |
 | XGBoost | 0.82 | 0.40 |
 
