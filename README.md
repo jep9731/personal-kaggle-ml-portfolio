@@ -10,10 +10,10 @@ This repository emphasizes **clear problem framing**, **exploratory analysis**, 
 |:-------:|:-------:|:------------:|:-----------:|
 | Stroke Prediction | Healthcare | Binary Classification | EDA, Imbalanced Data, XGBoost |
 | Symptoms → Disease NLP | Healthcare / NLP | Multi-Class Classification | TF-IDF, NLP, ML Pipelines |
-| House Prices (Kaggle) | Real Estate | Regression | Feature Engineering, Ensembles |
+| House Prices | Real Estate | Regression | Feature Engineering, Ensembles |
 | Breast Cancer Diagnostic | Healthcare | Binary Classification | Model Evaluation, Scaling |
 | Airline Delay Analysis | Transportation / Aviation Analytics | EDA & Time-Series Analysis | Large-Scale EDA, Time-Series Trends, Data Visualization |
-| Exam Score Prediction (Kaggle) | Education / Analytics | Regression | EDA, Feature Engineering, Model Interpretation |
+| Exam Score Prediction | Education / Analytics | Regression | EDA, Feature Engineering, Model Interpretation |
 
 ## 📂 Repository Structure
 ```
