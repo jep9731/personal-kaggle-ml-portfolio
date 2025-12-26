@@ -1,0 +1,692 @@
+---
+title: "Breast Cancer Diagnosis Prediction"
+author: "Joshua Pasaye"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup 1, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Remove environment
+rm(list = ls())
+
+# Install libraries
+## EDA/Data Preparation
+if (!requireNamespace("tidyverse", quietly = TRUE)) install.packages("tidyverse") # Data manipulation
+if (!requireNamespace("corrplot", quietly = TRUE)) install.packages("corrplot") # Correlation plot
+if (!requireNamespace("GGally", quietly = TRUE)) install.packages("GGally") # Pair plots
+
+## Metrics
+if (!requireNamespace("caret", quietly = TRUE)) install.packages("caret") #AUC
+if (!requireNamespace("Metrics", quietly = TRUE)) install.packages("Metrics") # Recall
+if (!requireNamespace("pROC", quietly = TRUE)) install.packages("pROC") # ROC
+
+## Models
+if (!requireNamespace("randomForest", quietly = TRUE)) install.packages("randomForest") # RF
+if (!requireNamespace("e1071", quietly = TRUE)) install.packages("e1071") # SVM
+
+# Load libraries
+library(tidyverse)
+library(corrplot)
+library(GGally)
+library(janitor)
+library(caret)
+library(Metrics)
+library(pROC)
+library(randomForest)
+library(e1071)
+```
+
+```{r setup 2, echo=FALSE}
+# Load file
+df <- read.csv(
+  "C:/Users/joshp/OneDrive/Documents/Kaggle/Breast cancer diagnostic/data/breast-cancer.csv" # Change path
+)
+
+# Drop redundant id variable
+df <- df[, names(df)[!names(df) %in% c("id")]]
+
+# Ensure diagnosis is factor for EDA
+df$diagnosis <- factor(df$diagnosis, levels = c("B", "M"))
+
+# Create target variable
+TARGET_F <- "diagnosis"
+```
+
+## Introduction
+
+This Markdown document will show an end-to-end ML modeling workflow for predicting breast cancer using **logistic regression**, **Support Vector Machines (SVM)**, and **Random Forest**. Additionally, **Principal Component Analysis (PCA)** will be used during EDA for variable reduction. Lastly, due to the likely class imbalance of the target variable, `diagnosis` (`B`: benign, `M`: malignant), **Synthetic Minority Over-sampling Technique (SMOTE)** will be employed to help the models from ignoring the minority class.
+
+### Skills Demonstrated
+
+-   Binary classification
+-   Class imbalance (SMOTE)
+-   Healthcare data analysis
+-   Model evaluation
+-   Feature scaling
+
+## EDA
+
+The steps used during EDA:
+
+-   Distribution of data
+-   Frequency tables
+-   Scatter plots
+-   Correlation plot
+
+First, I will look at the overall distribution of data using histograms of all the numeric columns (minus `diagnosis` column).
+
+```{r eda 1, fig.width=14, fig.height=10, echo=TRUE}
+# Histograms of the data
+df %>%
+  pivot_longer(cols = -c(diagnosis)) %>%
+  ggplot(aes(x = value, fill = diagnosis)) +
+  geom_histogram(bins = 30, color = "white", position = "identity", alpha = 0.5) +
+  facet_wrap(~ name, scales = "free") +
+  labs(title = "Distributions of Numerical Variables By Diagnosis") +
+  theme_bw()
+
+# Box plots of data
+df %>%
+  pivot_longer(cols = -c(diagnosis)) %>%
+  ggplot(aes(x = diagnosis, y = value, fill = diagnosis)) +
+  geom_boxplot() +
+  facet_wrap(~ name, scales = "free_y") +
+  labs(title = "Boxplots by Diagnosis") +
+  theme_bw()
+```
+
+In both groups, there seem to be outliers which will get taken care of later. Additionally, there is some skewness in the benign group as opposed to the malignant group.
+
+Now, I will look at a frequency table and bar chart of the target variable (`diagnosis`) which has whether the patient had a benign or malignant diagnosis.
+
+```{r eda 2, echo=TRUE}
+# Frequency tables
+cat("Frequency Table:\n", table(df$diagnosis), "\n")
+cat("Proportion Table:\n", prop.table(table(df$diagnosis)))
+
+# Bar chart
+ggplot(df, aes(x = diagnosis, fill = diagnosis)) +
+  geom_bar() +
+  geom_text(stat = "count", 
+            aes(label = after_stat(count), vjust = -0.5),
+            color = "black") +
+  scale_y_continuous(expand = expansion(mult = 0.1)) +
+  labs(title = "Frequency of Diagnosis") +
+  theme_bw()
+```
+
+There seems to be a slight class imbalance between benign and malignant diagnoses, with roughly **63%** of the patients having a non-cancerous diagnosis and **37%** percent of patients having cancerous diagnosis. This will also be handled later using SMOTE to artificially inflate the malignant category.
+
+Now I will look at scatter plots with the target variable (`diagnosis`) to determine any relationships in the data.
+
+```{r eda 3, fig.height=8, fig.width=14, echo=TRUE}
+# Create long dataframe
+df_long <- df %>%
+  pivot_longer(cols = -diagnosis,
+               names_to = "feature",
+               values_to = "value")
+
+# Scatter plot (all columns)
+ggplot(df_long, aes(x = diagnosis, y = value, fill = diagnosis)) +
+  geom_jitter(shape = 21, width = 0.2, alpha = 0.6) +
+  facet_wrap(~ feature, scales = "free_y") +
+  labs(title = "Scatter Plots of Features by Diagnosis",
+       x = "Diagnosis") +
+  theme_bw()
+```
+
+There seems to be a good amount of outliers, specifically in the `Malignant` group. That will be taken care of after the scaling of the data.
+
+Now, I will look at a correlation matrix plot with the target variables (`diagnosis`) to determine important columns during the model evaluation.
+
+```{r eda 4.1, echo=FALSE}
+# Make target variable integer
+df$diagnosis <- ifelse(df$diagnosis == "M"  , 1, 0)
+```
+
+```{r eda 4.2, fig.height=8, fig.width=8, echo=FALSE}
+# Get correlation matrix
+cor_matrix <- cor(df)
+
+# Correlation plot of first 10 columns
+corrplot(
+  cor(df[, 1:11]),
+  method = "circle",
+  order = "hclust",
+  addCoef.col = "black"
+)
+```
+
+It looks like `concave.point_mean` had the highest correlation with diagnosis at **0.78**. The next highest was was `perimeter_mean` at **0.74**, `radius_mean` at **0.73**, and `area_mean` at **0.71**. These variables will be the ones to look out for during the modeling output. However, **PCA** will be employed so we shall see if account for the most components.
+
+## Data Preparation
+
+This section will demonstrate methods of preparing the dataframe for modeling. Methods used includes:
+
+-   Imputation with median
+-   Data splitting (train/test data)
+-   SMOTE (train data ONLY)
+-   Scaling
+
+```{r imputation, echo=TRUE}
+# Determine missing variables
+df %>% sapply(., function(x) sum(is.na(x)))
+```
+
+It looks like there are no missing values! That means I can continue with splitting the data into a training and test set.
+
+```{r data splitting, echo=TRUE}
+# Set seed
+set.seed(123)
+
+# Create split index
+train_ind <- createDataPartition(df$diagnosis, p = 0.80, list = FALSE)
+
+# Split data
+train_df <- df[train_ind, ]
+test_df <- df[-train_ind, ]
+
+# Separate predictors and targets
+x_train <- train_df %>% select(-c(diagnosis)) # Remove target variable
+y_train <- train_df$diagnosis # Only target variable
+
+x_test <- test_df %>% select(-c(diagnosis)) # Remove target variable
+y_test <- test_df$diagnosis
+```
+
+Now that the data has been split into training and testing data, we can apply **SMOTE** to assist with the class imbalance.
+
+```{r SMOTE, echo=TRUE}
+# Combine into one dataframe
+train_df <- x_train
+train_df$diagnosis <- y_train
+
+# Check class distribution
+cat("Class distribution before:\n", table(train_df$diagnosis))
+
+# SMOTE
+smote_result <- smotefamily::SMOTE(X = train_df[, -ncol(train_df)], 
+                      target = train_df$diagnosis, 
+                      K = 5, 
+                      dup_size = 1
+                      )
+
+# Get balanced data
+train_smote_df <- smote_result$data
+
+# Convert target to numeric
+train_smote_df$class <- as.numeric(train_smote_df$class)
+colnames(train_smote_df)[ncol(train_smote_df)] <- "diagnosis"
+
+# Check new class distribution
+cat("Class distribution after:\n",table(train_smote_df$diagnosis))
+
+# Make final datasets
+x_train_final <- train_smote_df %>% select(-diagnosis)
+y_train_final <- train_smote_df$diagnosis
+
+# Recombine for models (Log ONLY)
+train_data <- x_train_final
+train_data$diagnosis <- y_train_final
+```
+
+We added 159 values to our dataset to balance out the numbers. Now, we can scale the training data ONLY. To prevent leakage, we once the data has been scaled, we will apply the scaler to the testing data.
+
+```{r scale, echo=TRUE}
+# Identify numeric columns only
+num_cols <- sapply(x_train_final, is.numeric)
+
+# Fit scaler on training data
+scaler <- preProcess(x_train_final[, num_cols], method = c("center", "scale"))
+
+# Apply scaler to training data
+x_train_final_scaled <- x_train_final
+x_train_final_scaled[, num_cols] <- predict(scaler, x_train_final[, num_cols])
+
+# Apply the same scaler to test data
+x_test_scaled <- x_test
+x_test_scaled[, num_cols] <- predict(scaler, x_test[, num_cols])
+
+# Recombine for modeling
+train_data_scaled <- x_train_final_scaled
+train_data_scaled$diagnosis <- y_train_final
+
+test_data_scaled <- x_test_scaled
+test_data_scaled$diagnosis <- y_test
+
+# Verify
+cat("Summary of scaled training data:\n")
+print(summary(train_data_scaled))
+```
+
+Now that the data is scaled, we can input it into our models. We will first run a **logistic regression**, then we will run a **Support vector Machine (SVM)**, and finally, we will run a **Random Forest** model.
+
+## Models
+
+### Logistical Regression
+
+We will begin with a logistical regression classification model as a baseline for classification. The goal would be for more advanced models such as ensemble learning (i.e., `Random Forests`) will perform better than a logistical regression.
+
+```{r log, echo=TRUE}
+# Set seed
+set.seed(123)
+
+# Model name
+WHO = "Logistical Regression"
+
+# Fit model
+log_model <- suppressWarnings(glm(
+  diagnosis ~ .,
+  data = train_data_scaled,
+  family = "binomial"
+  )
+)
+
+# Predict test model
+pred_log <- predict(
+  log_model,
+  newdata = x_test_scaled, 
+  type = "response"
+  )
+pred_log <- as.data.frame(pred_log) # Make dataframe
+
+# ROC AUC
+roc_obj <- roc(
+  response = y_test,
+  predictor = pred_log$pred_log
+)
+log_auc <- auc(roc_obj)
+cat("AUC:\n", log_auc)
+
+# Plot ROC
+png(filename = "C:/Users/joshp/OneDrive/Documents/Kaggle/Breast cancer diagnostic/figures/log_roc.png", 
+    width = 800, height = 600, units = "px")
+
+plot(
+    NULL,
+    col = "#2C7BB6",
+    lwd = 2,
+    xlim = c(0, 100), ylim = c(0, 100),
+    xlab = "False Positive Percentage",
+    ylab = "True Positive Percentage",
+    main = paste(WHO, "- ROC Curve (AUC =", round(auc(roc_obj), 3), ")")
+  )
+abline(a = 0, b = 1, lty = 2, col = "gray")
+
+# Scale to percentages for plotting
+roc_fp <- roc_obj$specificities * 100
+roc_tp <- roc_obj$sensitivities * 100
+lines(100 - roc_fp, roc_tp, col = "#D7191C", lwd = 2)
+
+invisible(dev.off())
+
+# Create confusion matrix
+pred_class_log <- ifelse(
+  pred_log$pred_log >= 0.5,
+  1,
+  0
+)
+
+# Calculate accuracy
+log_accuracy <- sum(pred_class_log == y_test) / length(pred_class_log)
+cat(
+  "Accuracy:\n", log_accuracy
+)
+
+conf_matrix_log <- table(
+  Actual = y_test,
+  Predicted = pred_class_log
+)
+
+cat("Confusion Matrix:\n", conf_matrix_log)
+
+# Reshape the confusion matrix for ggplot2
+conf_df <- as.data.frame(conf_matrix_log)
+
+ggplot(conf_df, aes(x = Actual, y = Predicted, fill = Freq)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = Freq), size = 6) +
+  scale_fill_gradient(low = "white", high = "steelblue") +
+  labs(
+    title = paste(
+      "Confusion Matrix –", WHO
+    ),
+    x = "Actual",
+    y = "Predicted"
+  ) +
+  theme_bw()
+ggsave(
+  "C:/Users/joshp/OneDrive/Documents/Kaggle/Breast cancer diagnostic/figures/log_confusion_matrix.png",
+  units = "in",
+  dpi = 300,
+  width = 6,
+  height = 8
+)
+
+# Show variables
+log_vars <- varImp(log_model, scale = TRUE)
+
+# Save variable names
+log_vars_df <- as.data.frame(log_vars)
+log_vars_df <- log_vars_df[order(-log_vars_df$Overall), , drop = FALSE] # Sort by descending order
+
+# Get top 10 variable names
+top_vars <- rownames(head(log_vars_df, n =10))
+
+# Save to a vector
+log_var_names <- top_vars
+cat("Top", WHO, "Predicting Varaibles:\n", log_var_names)
+```
+
+The logistic regression model accurately predicts breast cancer diagnosis, distinguishing benign from malignant tumors with an AUC of **0.975**. Key predictors, such as smoothness, compactness, and fractal dimension measures, have strong and statistically significant effects on the odds of malignancy, while some features are less influential. The use of SMOTE to balance the classes improved the model’s sensitivity to malignant cases, resulting in very few misclassifications in the test set. Although warnings about fitted probabilities of 0 or 1 indicate near-perfect separation, the model performs exceptionally well and provides clear insights into which features most strongly contribute to cancer risk.
+
+### Support Vector Machines
+
+```{r SVM, echo=TRUE}
+# Set seed
+set.seed(123)
+
+# Model name
+WHO = "Support Vector Machines"
+
+# Fit model
+svm_model <- suppressWarnings(svm(diagnosis ~ ., 
+                 data = train_data_scaled, 
+                 type = 'C-classification', 
+                 kernel = 'radial', 
+                 gamma = 0.1
+                 )
+)
+
+# Predict test model
+pred_svm <- predict(
+  svm_model,
+  newdata = x_test_scaled, 
+  decision.values = TRUE
+  )
+pred_svm_values <- as.numeric(attr(pred_svm, "decision.values")[,1]) # Extract as numeric vector
+
+# ROC AUC
+roc_obj <- roc(
+  response = y_test,
+  predictor = pred_svm_values
+)
+svm_auc <- auc(roc_obj)
+cat("AUC:\n", svm_auc)
+
+# Plot ROC
+png(filename = "C:/Users/joshp/OneDrive/Documents/Kaggle/Breast cancer diagnostic/figures/svm_roc.png", 
+    width = 800, height = 600, units = "px")
+
+plot(
+    NULL,
+    col = "#2C7BB6",
+    lwd = 2,
+    xlim = c(0, 100), ylim = c(0, 100),
+    xlab = "False Positive Percentage",
+    ylab = "True Positive Percentage",
+    main = paste(WHO, "- ROC Curve (AUC =", round(auc(roc_obj), 3), ")")
+  )
+abline(a = 0, b = 1, lty = 2, col = "gray")
+
+# Scale to percentages for plotting
+roc_fp <- roc_obj$specificities * 100
+roc_tp <- roc_obj$sensitivities * 100
+lines(100 - roc_fp, roc_tp, col = "#D7191C", lwd = 2)
+
+invisible(dev.off())
+
+# Create prediction classes
+pred_class_svm <- ifelse(
+  pred_svm_values >= 0.5,
+  1,
+  0
+)
+
+# Calculate accuracy
+svm_accuracy <- sum(pred_class_svm == y_test) / length(pred_class_svm)
+cat(
+  "Accuracy:\n", svm_accuracy
+)
+
+# Confusion matrix
+conf_matrix_svm <- table(
+  Actual = y_test,
+  Predicted = pred_class_svm
+)
+
+cat("Confusion Matrix:\n", conf_matrix_svm)
+
+# Reshape the confusion matrix for ggplot2
+conf_df <- as.data.frame(conf_matrix_svm)
+
+ggplot(conf_df, aes(x = Actual, y = Predicted, fill = Freq)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = Freq), size = 6) +
+  scale_fill_gradient(low = "white", high = "steelblue") +
+  labs(
+    title = paste(
+      "Confusion Matrix –", WHO
+    ),
+    x = "Actual",
+    y = "Predicted"
+  ) +
+  theme_bw()
+ggsave(
+  "C:/Users/joshp/OneDrive/Documents/Kaggle/Breast cancer diagnostic/figures/svm_confusion_matrix.png",
+  units = "in",
+  dpi = 300,
+  width = 6,
+  height = 8
+)
+```
+
+The SVM model demonstrates excellent predictive performance. The AUC of **0.998** indicates the model can almost perfectly discriminate between the two classes, meaning it very reliably ranks positive cases higher than negative ones. The confusion matrix shows 60 true positives, 41 true negatives, 12 false positives, and 0 false negatives. This implies the model is highly sensitive, as it correctly identifies all positive cases without missing any (0 false negatives), and has moderate specificity, with 12 negative cases incorrectly classified as positive. Overall, the model is highly accurate and suitable for reliably predicting the target outcome, though slight caution is warranted regarding the false positives.
+
+### Random Forest
+
+```{r RF, echo=TRUE}
+# Set seed
+set.seed(123)
+
+# Model name
+WHO = "Random Forest"
+
+# Fit model
+rf_model <- suppressWarnings(randomForest(
+  diagnosis ~ .,
+  data = train_data_scaled,
+  ntree = 500,
+  mtry = 2
+  )
+)
+
+# Predict test model
+pred_rf <- predict(
+  rf_model,
+  newdata = x_test_scaled, 
+  decision.values = TRUE
+  )
+pred_rf <- as.data.frame(pred_rf) # Make dataframe
+
+# ROC AUC
+roc_obj <- roc(
+  response = y_test,
+  predictor = pred_rf$pred_rf
+)
+rf_auc <- auc(roc_obj)
+cat("AUC:\n", rf_auc)
+
+# Plot ROC
+png(filename = "C:/Users/joshp/OneDrive/Documents/Kaggle/Breast cancer diagnostic/figures/rf_roc.png", 
+    width = 800, height = 600, units = "px")
+
+plot(
+    NULL,
+    col = "#2C7BB6",
+    lwd = 2,
+    xlim = c(0, 100), ylim = c(0, 100),
+    xlab = "False Positive Percentage",
+    ylab = "True Positive Percentage",
+    main = paste(WHO, "- ROC Curve (AUC =", round(auc(roc_obj), 3), ")")
+  )
+abline(a = 0, b = 1, lty = 2, col = "gray")
+
+# Scale to percentages for plotting
+roc_fp <- roc_obj$specificities * 100
+roc_tp <- roc_obj$sensitivities * 100
+lines(100 - roc_fp, roc_tp, col = "#D7191C", lwd = 2)
+
+invisible(dev.off())
+
+# Prediction classes
+pred_class_rf <- ifelse(
+  pred_rf$pred_rf >= 0.5,
+  1,
+  0
+)
+
+# Calculate accuracy
+rf_accuracy <- sum(pred_class_rf == y_test) / length(pred_class_rf)
+cat(
+  "Accuracy:\n", rf_accuracy
+)
+
+# Confusion matrix
+conf_matrix_rf <- table(
+  Actual = y_test,
+  Predicted = pred_class_rf
+)
+
+cat("Confusion Matrix:\n", conf_matrix_rf)
+
+# Reshape the confusion matrix for ggplot2
+conf_df <- as.data.frame(conf_matrix_rf)
+
+ggplot(conf_df, aes(x = Actual, y = Predicted, fill = Freq)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = Freq), size = 6) +
+  scale_fill_gradient(low = "white", high = "steelblue") +
+  labs(
+    title = paste(
+      "Confusion Matrix –", WHO
+    ),
+    x = "Actual",
+    y = "Predicted"
+  ) +
+  theme_bw()
+ggsave(
+  "C:/Users/joshp/OneDrive/Documents/Kaggle/Breast cancer diagnostic/figures/rf_confusion_matrix.png",
+  units = "in",
+  dpi = 300,
+  width = 6,
+  height = 8
+)
+
+# Show variables
+rf_vars <- varImp(rf_model)
+
+# Convert to data frame and sort
+rf_var_df <- as.data.frame(rf_vars)
+rf_var_df <- rf_var_df[order(-rf_var_df$Overall), , drop = FALSE]
+
+# Get 10 top variable names
+rf_var_names <- rownames(head(rf_var_df, n = 10))
+cat("Top", WHO, "varaibles:\n", rf_var_names)
+```
+
+The random forest model demonstrates excellent discriminative performance, with an **AUC of 0.998** indicating near-perfect ability to separate the two classes and an overall **accuracy of 97.3%**, meaning very few samples are misclassified. The confusion matrix shows only a small number of errors, with most observations correctly predicted in both classes, suggesting a well-balanced model rather than one driven by class imbalance. Variable importance results indicate that tumor size and shape characteristics dominate the model’s decisions: worst-case and mean measurements of perimeter, radius, and area, along with concavity and concave points, are the strongest predictors. This suggests the model primarily relies on features capturing extreme and average geometric irregularities of the tumor, which aligns with clinical understanding that larger, more irregular, and more concave tumor boundaries are strongly associated with malignancy.
+
+## Model Evaluation
+
+Finally, we will compare all the models' accuracy and AUC metrics into a combined dataframe and combine all the ROC plots into a final graph for easy comparison.
+
+```{r model comparison, echo=TRUE}
+# Table of metrics
+results_df <- data.frame(
+  Model = c("Logistic Regression", "Support Vector Machine", "Random Forest"),
+  Accuracy = c(round(log_accuracy, 3), round(svm_accuracy, 3), round(rf_accuracy, 3)),
+  ROC_AUC = c(round(log_auc, 3), round(svm_auc, 3), round(rf_auc, 3))
+)
+
+## Save table
+write.csv(
+  results_df, "C:/Users/joshp/OneDrive/Documents/Kaggle/Breast cancer diagnostic/results/results.csv"
+)
+
+## view table
+print(results_df)
+
+# Combined ROC plot
+png(
+  filename = "C:/Users/joshp/OneDrive/Documents/Kaggle/Breast cancer diagnostic/figures/model_comparison.png",
+  width = 800, height = 600, units = "px"
+)
+
+# Base plot
+plot(
+  NULL,
+  xlim = c(0, 100), ylim = c(0, 100),
+  xlab = "False Positive Percentage",
+  ylab = "True Positive Percentage",
+  main = "ROC Curve Comparison"
+)
+
+abline(a = 0, b = 1, lty = 2, col = "gray")
+
+colors <- c("#2C7BB6", "#D7191C", "#1A9641")
+labels <- c("Logistic Regression", "SVM", "Random Forest")
+auc_vals <- numeric(3)
+
+## Logistic Regression
+roc_log <- roc(y_test, pred_log$pred_log, quiet = TRUE)
+auc_vals[1] <- auc(roc_log)
+
+lines(
+  100 - roc_log$specificities * 100,
+  roc_log$sensitivities * 100,
+  col = colors[1],
+  lwd = 2
+)
+
+## Support Vector Machine
+roc_svm <- roc(y_test, pred_svm_values, quiet = TRUE)
+auc_vals[2] <- auc(roc_svm)
+
+lines(
+  100 - roc_svm$specificities * 100,
+  roc_svm$sensitivities * 100,
+  col = colors[2],
+  lwd = 2
+)
+
+## Random Forest
+roc_rf <- roc(y_test, pred_rf$pred_rf, quiet = TRUE)
+auc_vals[3] <- auc(roc_rf)
+
+lines(
+  100 - roc_rf$specificities * 100,
+  roc_rf$sensitivities * 100,
+  col = colors[3],
+  lwd = 2
+)
+
+## Legend
+legend(
+  "bottomright",
+  legend = sprintf("%s (AUC = %.3f)", labels, auc_vals),
+  col = colors,
+  lwd = 2,
+  bty = "n"
+)
+
+invisible(dev.off())
+```
+
+## Conclusion
+
+The results show that all three models perform exceptionally well in predicting breast cancer diagnosis, with very high ROC–AUC values indicating strong discriminatory power between benign and malignant cases. **Logistic Regression** and **Random Forest** both achieved an accuracy of **0.965**, demonstrating consistent and reliable classification performance, while the **Support Vector Machine (SVM)** achieved a slightly lower accuracy of **0.894**. Despite this, both the **SVM** and **Random Forest** attained near-perfect ROC–AUC scores of **0.998**, suggesting that these models are extremely effective at ranking malignant cases above benign ones, even if the default classification threshold leads to more misclassifications for the SVM.
+
+Comparatively, **Logistic Regression** provides a strong balance between interpretability and performance, with a high accuracy and an AUC of **0.975**, making it a robust and transparent baseline model. The Random Forest emerges as the strongest overall performer, matching Logistic Regression’s high accuracy while also achieving a near-perfect AUC, indicating excellent generalization and stability. Although the SVM demonstrates superior ranking ability, its lower accuracy suggests sensitivity to threshold selection. Overall, these results indicate that ensemble and margin-based models offer marginal performance gains, while simpler models like

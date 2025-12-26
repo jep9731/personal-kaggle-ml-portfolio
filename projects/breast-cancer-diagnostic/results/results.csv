@@ -1,0 +1,4 @@
+"","Model","Accuracy","ROC_AUC"
+"1","Logistic Regression",0.965,0.975
+"2","Support Vector Machine",0.894,0.998
+"3","Random Forest",0.965,0.998
