@@ -31,7 +31,8 @@ Develop and evaluate classification models that accurately predict whether a bre
 ## 🛠 Methodology
 - Exploratory Data Analysis to assess feature distributions and class balance
 - Feature scaling and normalization
-- Train–test split with stratification
+- Train–test split
+- SMOTE (Synthetic Minority Oversampling Technique)
 - Models evaluated:
   - Logistic Regression
   - Support Vector Machine (SVM)
