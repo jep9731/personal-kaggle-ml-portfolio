@@ -1,6 +1,0 @@
-"","Model","RMSE"
-"1","Linear Regression",0.169749970505209
-"2","LASSO",0.169487950087963
-"3","Random Forest",0.169852105356297
-"4","Gradient Boosting",0.17374976468672
-"5","XGBoost",0.176760918912341
