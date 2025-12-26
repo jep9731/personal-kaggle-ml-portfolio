@@ -12,7 +12,7 @@ This repository emphasizes **clear problem framing**, **exploratory analysis**, 
 | Symptoms → Disease NLP | Healthcare / NLP | Multi-Class Classification | TF-IDF, NLP, ML Pipelines |
 | House Prices (Kaggle) | Real Estate | Regression | Feature Engineering, Ensembles |
 | Breast Cancer Diagnostic | Healthcare | Binary Classification | Model Evaluation, Scaling |
-| Spotify Analysis | Consumer Analytics | EDA & Visualization | Data Storytelling, Insights |
+| Airline Delay Analysis | Transportation / Aviation Analytics | EDA & Time-Series Analysis | Large-Scale EDA, Time-Series Trends, Data Visualization |
 | Exam Score Prediction (Kaggle) | Education / Analytics | Regression | EDA, Feature Engineering, Model Interpretation |
 
 ## 📂 Repository Structure
@@ -78,7 +78,7 @@ personal-kaggle-ml-portfolio/
 | | └── requirements/
 | |   └── requirements.txt
 | | 
-| ├── spotify-analysis/
+| ├── airline-delay-analysis/
 │ │ ├── README.md
 │ │ ├── data/
 │ │ ├── notebooks/
@@ -228,27 +228,35 @@ Full technical details, notebooks, results, and evaluations are available inside
 
 ---
 
-## 🎵 Spotify Track Analysis & Visualization
+## ✈️ Airline Delay Analysis – U.S. Aviation Operations EDA
 
-**Problem:** Audio features and metadata relationship, patterns and trends in genres and artist.
+**Problem:** Analyze causes and patterns of U.S. domestic airline delays across airlines, airports, and time
 
-**Type:** Exploratory Data Analysis & Visualization
+**Type:** Exploratory Data Analysis / Time-Series Analysis
 
-**Domain:** Entertainment / Consumer Analytics 
+**Domain:** Transportation Analytics / Aviation
 
 **Techniques Used**
 
-* EDA
-* Data visualization
-* Data storytelling
+* Large-scale EDA on 20 years of airline delay data (2003–2022).
+* Time-series analysis of delay trends by month and year.
+* Aggregation and comparison across airlines and airports.
+* Breakdown of delay causes (carrier, weather, NAS, security, late aircraft).
+* Data visualization for operational and reliability insights.
+
+**Key Insights Explored**
+
+* Which airlines and airports are most delay-prone.
+* How delay causes shift seasonally and over time.
+* Dominant contributors to total delay minutes.
+* Reliability comparisons across carriers and hubs.
 
 **Highlight**
 
-* Energy and loudness show strong positive correlation.
-* High-energy tracks tend to score higher in popularity.
-* Genres cluster into distinct audio profiles based on tempo and valence.
+* Demonstrates real-world analytics on a 42MB operational dataset.
+* Strong emphasis on storytelling, trends, and actionable aviation insights.
 
-`📂 projects/spotify-analysis/`
+`📂 projects/airline-delay-analysis/`
 
 ---
 
