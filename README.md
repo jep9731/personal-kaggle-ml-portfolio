@@ -25,27 +25,26 @@ personal-kaggle-ml-portfolio/
 │ ├── stroke-prediction/
 │ │ ├── README.md # Project summary
 │ │ ├── data/ # Dataset
-│ │ │ ├── stroke_prediction.R
-│ │ │ ├── healthcare-dataset-stroke-data.csv
-│ │ └── results/
-│ │ | ├── results.csv
-│ │ └── figures/
-| | | ├── logistic_roc.png
-| | | ├── rf_roc.png
-| | | ├── xgb_roc.png
-| | | ├── model_comparisons_roc.png
+│ │ │ └── stroke_prediction.R
+│ │ │ └── healthcare-dataset-stroke-data.csv
+│ │ ├── results/
+│ │ | └── results.csv
+│ │ ├── figures/
+| | | └── logistic_roc.png
+| | | └── rf_roc.png
+| | | └── xgb_roc.png
+| | | └── model_comparisons_roc.png
 │ │ └── requirements/
 | |   └── requirements.txt
 │ │
 │ ├── symptoms-disease-nlp/
 │ │ ├── README.md
 │ │ ├── data/
-│ │ ├── notebooks/
-│ │ │ ├── 01_text_eda.ipynb
-│ │ │ ├── 02_feature_engineering.ipynb
+│ │ │ └── 01_text_eda.ipynb
+│ │ │ └── 02_feature_engineering.ipynb
 │ │ │ └── 03_multiclass_models.ipynb
 │ │ └── results/
-│ │   ├── classification_report.txt
+│ │   └── classification_report.txt
 │ │   └── confusion_matrix.png
 │ │
 │ └── house-prices-regression/
@@ -63,43 +62,43 @@ personal-kaggle-ml-portfolio/
 | ├── breast-cancer-diagnostic/
 │ │ ├── README.md
 │ │ ├── data/
-│ │ │ ├── breast_cancer_prediction.Rmd
-│ │ │ ├── breast_cancer.csv
-│ │ └── figures/
-| | | ├── log_roc.png
-| | | ├── log_confusion_matrix.png
-| | | ├── svm_roc.png
-| | | ├── svm_confusion_matrix.png
-| | | ├── rf_roc.png
-| | | ├── rf_confusion_matrxi.png
-| | | ├── model_comparisons.png
-│ │ └── results/
-│ │ | ├── results.csv
+│ │ │ └── breast_cancer_prediction.Rmd
+│ │ │ └── breast_cancer.csv
+│ │ ├── figures/
+| | | └── log_roc.png
+| | | └── log_confusion_matrix.png
+| | | └── svm_roc.png
+| | | └── svm_confusion_matrix.png
+| | | └── rf_roc.png
+| | | └── rf_confusion_matrxi.png
+| | | └── model_comparisons.png
+│ │ ├── results/
+│ │ | └── results.csv
 | | └── requirements/
 | |   └── requirements.txt
 | | 
 | ├── airline-delay-analysis/
 │ │ ├── README.md
 │ │ ├── data/
+│ │ │ └── Airline_Delay_Cause.csv
+| | ├── dashboard/
+│ | | └──airline_delay_dashboard.Rmd
 │ │ ├── notebooks/
-│ │ │ ├── 01_text_eda.ipynb
-│ │ │ ├── 02_feature_engineering.ipynb
-│ │ │ └── 03_multiclass_models.ipynb
-│ │ └── results/
-│ │   ├── classification_report.txt
-│ │   └── confusion_matrix.png
+│ │ | └── exploratory_analysis.R
+| | └── requirements/
+| |   └── requirements.txt
 | |
 | ├── exam-score-prediction/
 │ │ ├── README.md
 │ │ ├── data/
-│ │ │ ├── breast_cancer_prediction.Rmd
-│ │ │ ├── Exam_Score_Prediction.csv
-│ │ └── figures/
-| | | ├── log_roc.png
-| | | ├── log_confusion_matrix.png
-| | | ├── model_comparisons.png
-│ │ └── results/
-│ │ | ├── results.csv
+│ │ │ └── breast_cancer_prediction.Rmd
+│ │ │ └── Exam_Score_Prediction.csv
+│ │ ├── figures/
+| | | └── log_roc.png
+| | | └── log_confusion_matrix.png
+| | | └── model_comparisons.png
+│ │ ├── results/
+│ │ | └── results.csv
 | | └── requirements/
 | |   └── requirements.txt
 | |
