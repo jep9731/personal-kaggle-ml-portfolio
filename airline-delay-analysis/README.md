@@ -1,103 +1,140 @@
-# ✈️ Airline Delay Analysis – U.S. Aviation Operations EDA
+# ✈️ Airline Delay Analysis – U.S. Aviation Operations  
+### EDA & Interactive Dashboarding with R (flexdashboard)
 
-## 📌 Project Overview
+### 📌 Project Overview
 
-This project explores nearly two decades of U.S. domestic airline delay data to understand **why flights are delayed**, how delay causes vary across airlines and airports, and how patterns change over time.
+This project analyzes nearly two decades of U.S. domestic airline delay data to understand **why flights are delayed**, how delay causes vary across airlines and airports, and how these patterns change over time.
 
-Using large-scale operational data, the analysis focuses on delay **frequency**, **severity**, and **causes**, with an emphasis on clear visualizations and actionable insights for aviation analytics.
+The analysis culminates in an **interactive dashboard built in R using `flexdashboard`**, designed for exploratory analysis, stakeholder reporting, and operational insight.
 
 ---
 
 ### 🧠 Problem Statement
 
-**Analyze:**  
-U.S. airline delays by carrier, airport, time, and delay cause  
+**Analyze and communicate:**
+- Airline and airport reliability
+- Delay severity and frequency
+- Root causes of delays across time and seasonality
 
-**Answer questions such as:**
-- Which airlines and airports experience the most delays?
-- What delay causes dominate overall delay minutes?
-- How do delay patterns change seasonally and over time?
+**Primary objective:**  
+Enable users to **interactively explore delay patterns** by airline, airport, time period, and delay cause.
 
 ---
 
 ### 📊 Dataset Description
 
 - **Dataset:** Airline Delay Cause
-- **Coverage:** ~2003–2022 (nearly 20 years)
+- **Coverage:** ~2003–2022
 - **File:** `Airline_Delay_Cause.csv` (~42 MB)
 - **Granularity:** Monthly aggregates by:
   - Year & month
   - Operating carrier
-  - Origin airport (IATA code + full name)
+  - Origin airport (IATA code + full airport name)
 
-**Key Variables:**
+#### Delay Cause Categories
 
-- Total number of flights
-- Number of delayed flights
-- Delay minutes broken down by cause:
-  - Carrier-related delays
-  - Weather delays
-  - NAS (air traffic system) delays
-  - Security delays
-  - Late aircraft delays
+- Carrier-related delays  
+- Weather delays  
+- NAS (air traffic system) delays  
+- Security delays  
+- Late aircraft delays  
 
-The dataset is well-suited for exploratory analysis, trend detection, and aviation-focused dashboards.
+The dataset’s structure is well-suited for **time-series analysis and interactive filtering**.
 
 ---
 
-### 🔧 Techniques Used
+### 🔧 Tools & Technologies
+
+- **R**
+- **tidyverse** (data wrangling & EDA)
+- **lubridate** (time handling)
+- **flexdashboard** (dashboard layout)
+- **ggplot2 / plotly** (static & interactive visualizations)
+- **DT** (interactive tables)
+
+---
+
+### 🔬 Analysis Workflow
 
 #### Data Preparation
-- Efficient loading and handling of large CSV files
+- Efficient loading of large CSV files
 - Aggregation by airline, airport, year, and month
-- Handling missing values and zero-delay cases
+- Creation of derived metrics:
+  - Delay rate
+  - Average delay minutes per flight
+  - Cause-level delay shares
 
 #### Exploratory Data Analysis (EDA)
-- Delay frequency vs. delay severity analysis
-- Ranking airlines and airports by reliability
-- Distribution analysis of delay causes
-- Seasonal and long-term trend analysis
+- Airline and airport reliability rankings
+- Delay frequency vs severity analysis
+- Cause-level contribution analysis
+- Seasonal and long-term trend exploration
 
-#### Time-Series Analysis
+---
+
+### 📊 Dashboard Design (flexdashboard)
+
+The dashboard is built using **`flexdashboard`** to support interactive, self-service analysis.
+
+### Dashboard Sections
+
+**1. Overview**
+- Total flights vs delayed flights
+- Average delay minutes
+- High-level cause breakdown
+
+**2. Airline Performance**
+- Delay rate and severity by carrier
+- Cause distribution per airline
+- Airline reliability rankings
+
+**3. Airport Performance**
+- Delay severity by airport
+- Hub vs non-hub comparisons
+- Seasonal airport delay patterns
+
+**4. Time & Seasonality**
 - Monthly and yearly delay trends
-- Cause-specific trend comparisons
-- Identification of structural changes over time
+- Cause-specific time-series views
+- Weather vs operational delay comparisons
 
-#### Visualization
-- Time-series plots
-- Comparative bar charts and rankings
-- Cause breakdowns by airline and season
+#### Interactivity Features
+
+- Dropdown filters (airline, airport, year)
+- Hover-enabled charts (via `plotly`)
+- Sortable and searchable tables (`DT`)
+- Responsive layout for wide and narrow screens
 
 ---
 
 ### 📈 Key Insights Explored
 
-- Late aircraft and carrier-related issues account for the largest share of delay minutes
-- Weather delays show strong seasonal patterns
-- Certain hub airports consistently experience higher delay severity
-- Airline reliability varies significantly when normalized by total flights
+- Late aircraft and carrier-related delays dominate total delay minutes
+- Weather delays exhibit strong seasonal patterns
+- Major hub airports show higher delay severity
+- Airline reliability varies significantly when normalized by flight volume
 
 ---
 
 ### ⭐ Project Highlights
 
-- Demonstrates real-world EDA on a **large operational dataset**
-- Strong emphasis on **data storytelling and trend analysis**
-- Relevant for transportation analytics, operations research, and dashboarding
-- Scales well to BI tools (Tableau, Power BI, Plotly)
+- End-to-end analytics project using **R + flexdashboard**
+- Designed for **exploration, reporting, and storytelling**
+- Handles large, real-world operational data
+- Strong fit for data analyst and BI-focused roles
 
 ---
 
-### 🚀 Future Work
+### 🚀 Future Enhancements
 
-- Build predictive models for delay severity by airline and airport
-- Create an interactive dashboard for delay exploration
-- Normalize delay metrics by route volume
-- Extend analysis to route-level or airport-pair insights
+- Add delay forecasting using time-series models
+- Publish dashboard via R Markdown / Shiny Server
+- Add route-level analysis
+- Optimize performance with data.table or Arrow
 
 ---
 
 ### 📎 Notes
 
 This project focuses on **exploratory and descriptive analytics** rather than prediction.  
-All analysis is reproducible using the provided notebooks.
+All insights are reproducible using the provided R scripts and dashboard code.
