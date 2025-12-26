@@ -1,0 +1,17 @@
+# Data manipulation
+dplyr
+tidyr
+tibble
+
+# Data splitting and preprocessing
+caret
+recipes
+
+# Modeling
+randomForest
+xgboost
+
+# Metrics and evaluation
+porch
+Metrics
+corrplot
