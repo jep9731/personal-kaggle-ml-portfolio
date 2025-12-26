@@ -91,7 +91,7 @@ personal-kaggle-ml-portfolio/
 | ├── exam-score-prediction/
 │ │ ├── README.md
 │ │ ├── data/
-│ │ │ └── breast_cancer_prediction.Rmd
+│ │ │ └── exam_score_prediction.Rmd
 │ │ │ └── Exam_Score_Prediction.csv
 │ │ ├── figures/
 | | | └── log_roc.png
