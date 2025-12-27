@@ -220,7 +220,7 @@ Full technical details, notebooks, results, and evaluations are available inside
 
 **Highlight**
 
-* Improved classification outcomes using ensemble methods.
+* Improved classification outcomes using Logistical Regression.
 * Strong emphasis on healthcare-relevant evaluation metrics.
 
 `📂 projects/breast-cancer-diagnostic/`
