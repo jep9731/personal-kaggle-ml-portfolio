@@ -90,5 +90,5 @@ RMSE was chosen to penalize larger prediction errors and maintain interpretabili
 
 ### 📎 Notes
 
-This project is intended for educational and analytical purposes.  
-All results are reproducible using the provided notebooks.
+- This project is intended for educational and analytical purposes.
+- All results are reproducible using the provided notebooks.
