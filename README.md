@@ -93,10 +93,6 @@ personal-kaggle-ml-portfolio/
 │ │ ├── data/
 │ │ │ └── exam_score_prediction.Rmd
 │ │ │ └── Exam_Score_Prediction.csv
-│ │ ├── figures/
-| | | └── log_roc.png
-| | | └── log_confusion_matrix.png
-| | | └── model_comparisons.png
 │ │ ├── results/
 │ │ | └── results.csv
 | | └── requirements/
