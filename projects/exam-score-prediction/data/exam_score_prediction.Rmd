@@ -56,13 +56,11 @@ df <- df %>%
 num_cols <- df %>%
   select(where(is.numeric), -exam_score) %>%
   names()
-cat("Numeric columns:", num_cols)
 
 # Categorical columns
 cat_cols <- df %>%
   select(where(is.factor)) %>%
   names()
-cat("\nCategorical columns:", cat_cols)
 ```
 
 ## Introduction
@@ -231,7 +229,6 @@ test_data_scaled <- x_test_scaled
 test_data_scaled$exam_score <- y_test
 
 # Verify
-cat("Summary of scaled training data:\n")
 print(summary(train_data_scaled))
 ```
 
@@ -276,7 +273,7 @@ importance <- importance[order(-importance$abs_coefficient), ]
 lm_vars <- head(importance$variable, 10)
 
 # View top variables
-cat("\nLinear Model variables:\n", lm_vars)
+cat("Linear Model variables:\n", lm_vars)
 ```
 
 The linear regression model achieved an RMSE of **9.84** on the test set, indicating that predicted exam scores deviate from actual values by approximately 10 points on average. Among all predictors, **study hours** emerged as the most influential variable, followed by **class attendance**, highlighting the importance of consistent study behavior and engagement. Several categorical factors also played meaningful roles, particularly **good sleep quality**, **coaching-based study methods**, and **adequate sleep duration**, all of which were associated with higher exam scores. Additional contributors included **average sleep quality**, **facility rating**, and collaborative study approaches such as **group study** and **mixed methods**, though with smaller effects. Overall, the model captures the primary academic and environmental factors affecting exam performance, serving as a strong and interpretable baseline.
@@ -321,7 +318,7 @@ imp_df <- imp_df[order(-imp_df$importance), ]
 rf_vars <- head(imp_df$variable, 10)
 
 # View top variables
-cat("\nRandom Forest Model variables:\n", rf_vars)
+cat("Random Forest Model variables:\n", rf_vars)
 ```
 
 The random forest model achieved an RMSE of **10.07** on the test set, indicating an average prediction error of approximately 12 exam score points. As with the linear model, **study hours** emerged as the most influential predictor, followed by **class attendance**, reinforcing the importance of consistent academic engagement. Study behaviors and learning environments also contributed meaningfully, with **coaching-based study methods**, **sleep duration**, and **sleep quality (both poor and good)** showing notable influence on exam performance. **Facility quality** and **self-study** approaches provided additional explanatory power, though to a lesser extent. Despite its ability to model non-linear relationships and interactions, the random forest slightly underperformed the linear model in this case, suggesting that the dominant relationships in the data are largely linear and well captured by simpler modeling approaches.
@@ -360,7 +357,7 @@ gbm_var <- summary(gbm_r, plotit = FALSE, order = TRUE)
 gbm_vars <- head(gbm_var$var, 10)
 
 # View top variables
-cat("\nGradient Boosting Model variables:\n", gbm_vars)
+cat("Gradient Boosting Model variables:\n", gbm_vars)
 ```
 
 The gradient boosting model achieved an RMSE of **9.87** on the test set, indicating an average prediction error of just under 10 exam score points and performance comparable to the linear regression baseline. The model identified **study hours** as the most influential predictor by a wide margin, followed by **class attendance** and **sleep duration**, highlighting the importance of consistent academic effort and rest. Several behavioral and environmental factors also contributed meaningfully, including **coaching-based study methods**, **sleep quality**, and **facility rating**, while age played a minor role. Despite its ability to capture non-linear effects and higher-order interactions, gradient boosting did not substantially outperform the linear model, suggesting that the dominant relationships in the data are largely additive and well approximated by simpler modeling approaches.
@@ -403,7 +400,7 @@ xgb.plot.importance(importance_matrix = importance)
 xgb_vars <- head(importance$Feature, 10)
 
 # View top variables
-cat("\nXGBoost Model variables:\n", xgb_vars)
+cat("XGBoost Model variables:\n", xgb_vars)
 ```
 
 The XGBoost regression model achieved an RMSE of **9.89** on the test set, corresponding to an average prediction error of approximately 10 exam score points. Consistent with the other modeling approaches, **study hours** was the most influential predictor, followed by **class attendance**, reinforcing the central role of sustained academic engagement in exam performance. Study behaviors and well-being factors, including **coaching-based study methods**, **sleep quality**, and **sleep duration**, contributed meaningfully to the model’s predictions, while **facility rating** and **alternative study approaches** provided additional explanatory power. Overall, the XGBoost model captured non-linear patterns and interactions in the data but delivered performance similar to the linear and gradient boosting models, suggesting that the underlying relationships are largely additive and dominated by a small set of key predictors.
