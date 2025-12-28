@@ -1,0 +1,449 @@
+---
+title: "Exam Score Prediction"
+author: "Joshua Pasaye"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup 1, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Install packages
+# Remove environment
+rm(list = ls())
+
+# Install libraries
+## EDA/Data Preparation
+if (!requireNamespace("tidyverse", quietly = TRUE)) install.packages("tidyverse") # Data manipulation
+if (!requireNamespace("corrplot", quietly = TRUE)) install.packages("corrplot") # Correlation plot
+if (!requireNamespace("GGally", quietly = TRUE)) install.packages("GGally") # Pair plots
+
+## Metrics
+if (!requireNamespace("Metrics", quietly = TRUE)) install.packages("Metrics") # RMSE
+
+## Models
+if (!requireNamespace("randomForest", quietly = TRUE)) install.packages("randomForest") # RF
+if (!requireNamespace("gbm", quietly = TRUE)) install.packages("gbm") # GB
+if (!requireNamespace("xgboost", quietly = TRUE)) install.package("xgboost") # XGBoost
+
+# Load libraries
+library(tidyverse)
+library(corrplot)
+library(GGally)
+library(janitor)
+library(caret)
+library(Metrics)
+library(pROC)
+library(randomForest)
+library(gbm)
+library(xgboost)
+```
+
+```{r setup 2, echo=FALSE}
+# Load file
+df <- read.csv(
+  "C:/Users/joshp/OneDrive/Documents/Kaggle/projects/exam-score-prediction/data/Exam_Score_Prediction.csv" # Change path
+)
+
+# Drop redundant id variable
+df <- df[, names(df)[!names(df) %in% c("student_id")]]
+
+# Ensure categorical columns are factors
+df <- df %>%
+  mutate(across(where(is.character), as.factor))
+
+# Numeric columns
+num_cols <- df %>%
+  select(where(is.numeric), -exam_score) %>%
+  names()
+cat("Numeric columns:", num_cols)
+
+# Categorical columns
+cat_cols <- df %>%
+  select(where(is.factor)) %>%
+  names()
+cat("\nCategorical columns:", cat_cols)
+```
+
+## Introduction
+
+This Markdown document will show an end-to-end ML modeling workflow for predicting student exam scores using **Linear regression**, **Random Forest Regressor**, **Gradient Boosting Regressor**, and **XGBoost Regressor** models. First, I will perform an **Exploratory Data Analysis (EDA)** to determine any potential variables of interest and examine relationships between the predictors and the target variable (`exam_score`). Then, I will prepare the data for modeling; this will include, **imputation** of any missing numeric columns with the `median` and any categorical columns with the `mode`, **splitting** the data into training and test datasets, and **scaling** the data using only the training data and apply that to the testing data. Finally, I will be using the **Root Mean Square Error (RMSE)** as the metric to compare the different models at the end.
+
+### Skills Demonstrated
+
+-   Regression analysis
+-   Exam score analysis
+-   EDA
+-   Feature engineering
+-   Model evaluation
+-   Model tuning
+
+## EDA
+
+```{r eda 1, fig.width= 6, fig.height=5, echo=FALSE}
+summary(df$exam_score)
+hist(df$exam_score, breaks = 40, main = "Histogram of Exam Score (Target)", xlab = "Exam Score")
+```
+
+The target variable seems to be a normal distributed exam score with a majority sitting around the 60-70% mark, however, there is a large number of students that received a 100%.
+
+```{r eda 2, fig.width= 6, fig.height=5, echo=FALSE}
+boxplot(exam_score ~ exam_difficulty, data = df, xlab = "Exam Difficulty", ylab = "Exam Score")
+```
+
+There is no difference between exam score and the difficulty of the exam as each level of difficulty has the same median around 60%.
+
+```{r eda 3, fig.width= 6, fig.height=5, echo=FALSE}
+# Correlation
+num_vars <- df[, c("exam_score", "age", "study_hours",
+                   "class_attendance", "sleep_hours")]
+cor(num_vars)
+```
+
+`study_hours` shows the strongest relationship with `exam_score`, with a correlation of **0.72**, indicating a strong positive linear association. As study hours increase, exam scores rise substantially, suggesting that study time will be a key driver in any linear predictive model.
+
+`class_attendance` has the second-highest correlation at **0.31**, which indicates a moderate positive relationship rather than a weak one. While the relationship is noisier than that of study hours, students with higher attendance generally achieve better exam scores, implying attendance still contributes meaningful predictive signal.
+
+Both `sleep_hours` and `age` show weak relationships with exam score, with correlations of **0.13** and **0.007**, respectively. Age appears to have virtually no effect on performance, while sleep duration has a small positive association.
+
+```{r eda 4, fig.width= 6, fig.height=5, echo=FALSE}
+# Numeric variables
+plot(df$study_hours, df$exam_score, main = "Scatter plot: Study Hours vs Exam Score", xlab = "Study Hours", ylab = "Exam Score")
+
+plot(df$class_attendance, df$exam_score, main = "Scatter plot: Class Attendance vs Exam Score", xlab = "Class Attendance", ylab = "Exam Score")
+
+boxplot(exam_score ~ cut(sleep_hours, 5), data = df, ylab = "Exam Score", xlab = "Sleep hours")
+```
+
+Students sleeping approximately **7.5–9+** hours tend to perform marginally better than those sleeping **4–5** hours, suggesting a weak but potentially non-linear effect.
+
+Visual inspection confirms that students who studied longer generally achieved higher exam scores. While the relationship between class attendance and exam score is not strongly linear, lower attendance levels are associated with noticeably poorer performance. Sleep duration shows diminishing returns, where moderate sleep appears beneficial but excessive sleep does not meaningfully improve outcomes.
+
+```{r eda 5, fig.width= 6, fig.height=5, echo=FALSE}
+# Categorical variables
+boxplot(exam_score ~ gender, data = df, xlab = "Gender", ylab = "Exam Score")
+
+boxplot(exam_score ~ course, data = df, xlab = "Course", ylab = "Exam Score")
+
+boxplot(exam_score ~ internet_access, data = df, xlab = "Internet Access", ylab = "Exam Score")
+
+boxplot(exam_score ~ sleep_quality, data = df, xlab = "Sleep quality", ylab = "Exam Score")
+
+boxplot(exam_score ~ study_method, data = df, xlab = "Study Method", ylab = "Exam Score")
+
+boxplot(exam_score ~ facility_rating, data = df, xlab = "Facility Rating", ylab = "Exam Score")
+```
+
+Among categorical variables, `gender`, `internet_access`, and `course` show little to no impact on exam scores, as their distributions largely overlap across groups. In contrast, `sleep_quality` demonstrates a modest effect: students reporting **good** sleep quality achieve the highest median scores (around 70%), while those reporting **poor** sleep perform the worst (around 60%). This aligns with expectations that better sleep quality improves cognitive performance and information retention.
+
+`study_method` exhibits a clearer relationship with exam outcomes. Students using **coaching** methods achieve the highest median scores (≈70%), followed by **mixed** methods (≈65%), while **self-study** performs the worst (≈60%). This suggests structured or guided study approaches may be more effective.
+
+Finally, `facility_rating` shows a moderate association with exam scores. Students in **high-rated** facilities score approximately 65% on average, compared to around 60% in **low-rated** facilities. This indicates that external environmental factors such as comfort and exam conditions may modestly influence student performance.
+
+```{r eda 6, fig.width= 6, fig.height=5, echo=FALSE}
+ggplot(df, aes(study_hours, exam_score, color = cut(class_attendance, 3))) +
+  geom_point(alpha = 0.2) +
+  labs(
+    x= "Study Hours",
+    y= "Exam Score",
+    col = "Class Attendance"
+  )
+```
+
+Students that studied more and had higher class attendance performed better on the exam, indicating that `study_hours` and `class_attendance` have an impact on students performance.
+
+**Strong predictors:**
+
+- `study_hours`
+- `class_attendance`
+- `sleep_quality`
+- `study_method`
+- `facility_rating`
+
+## Data Preparation
+
+This section will demonstrate methods of preparing the dataframe for modeling. Methods used includes:
+
+-   Imputation of missing data
+-   one-hot encoding
+-   Data splitting (train/test data)
+-   Scaling
+
+```{r imputation, echo=TRUE}
+# Check any missing data
+df %>% sapply(., function(x) sum(is.na(x)))
+```
+
+It looks like there are no missing values! I will use one-hot encoding to transform categorical variables into numeric variables.
+
+```{r ohe, echo=TRUE}
+# Define one-hot encoding function
+dummy <- dummyVars(" ~ .", data=df)
+
+# Perform one-hot encoding on data frame
+df_final <- data.frame(predict(dummy, newdata=df))
+dim(df_final)
+```
+
+With only numeric variables, I can now split the data into training and testing datasets.
+
+```{r data splitting, echo=TRUE}
+# Set seed
+set.seed(123)
+
+# Create split index
+train_ind <- createDataPartition(df_final$exam_score, p = 0.80, list = FALSE)
+
+# Split data
+train_df <- df_final[train_ind, ]
+test_df <- df_final[-train_ind, ]
+
+# Separate predictors and targets
+x_train <- train_df %>% select(-c(exam_score)) # Remove target variable
+y_train <- train_df$exam_score # Only target variable
+
+x_test <- test_df %>% select(-c(exam_score)) # Remove target variable
+y_test <- test_df$exam_score
+```
+
+We can scale the training dataset ONLY using the `preProcess` function in the `caret` package. To prevent data leakage, we apply the scaler created using the training dataset to the testing dataset.
+
+```{r scale, echo=TRUE}
+# Identify numeric columns only
+num_cols <- sapply(x_train, is.numeric)
+
+# Fit scaler on training data
+scaler <- preProcess(x_train[, num_cols], method = c("center", "scale"))
+
+# Apply scaler to training data
+x_train_scaled <- x_train
+x_train_scaled[, num_cols] <- predict(scaler, x_train[, num_cols])
+
+# Apply the same scaler to test data
+x_test_scaled <- x_test
+x_test_scaled[, num_cols] <- predict(scaler, x_test[, num_cols])
+
+# Recombine for modeling
+train_data_scaled <- x_train_scaled
+train_data_scaled$exam_score <- y_train
+
+test_data_scaled <- x_test_scaled
+test_data_scaled$exam_score <- y_test
+
+# Verify
+cat("Summary of scaled training data:\n")
+print(summary(train_data_scaled))
+```
+
+The data is scaled, we can input it into our models. We will first perform **linear regression** model, then we will perform a **Random Forest Regressor** model, then we will perform a **Gradient Boosting Regressor** model, and finally, we will perform a **XGBoost Regressor** model. To compare each of the models, we will calculate the **Root Mean Square Error (RMSE)** on the predicted exam scores from the testing dataset after the models have been fitted to the training dataset.
+
+## Models
+
+### Linear Regression
+
+We will begin with a linear regression classification model as a baseline for prediction. The goal would be for more advanced models such as ensemble learning (i.e., `Random Forests`, `Gradient Boosting`, `XGBoosting`) will perform better than a linear regression.
+
+```{r linear, echo=TRUE}
+# Reproducibility
+set.seed(123)
+
+# Fit linear model
+lm_r <- lm(
+  formula = exam_score ~ ., 
+  data = train_data_scaled
+  )
+
+# Predict test model
+lm_pred <- predict(lm_r, newdata = x_test_scaled, type = "response")
+lm_pred <- as.data.frame(lm_pred) # Make dataframe
+
+# Calculate Metrics
+lm_rmse <- rmse(actual = y_test, predicted = lm_pred$lm_pred)
+cat("RMSE of  Linear Model:", lm_rmse)
+
+# Extract coefficients (drop intercept)
+coefs <- coef(lm_r)[-1]
+
+# Create importance table
+importance <- data.frame(
+  variable = names(coefs),
+  coefficient = coefs,
+  abs_coefficient = abs(coefs)
+)
+
+# Sort by importance
+importance <- importance[order(-importance$abs_coefficient), ]
+lm_vars <- head(importance$variable, 10)
+
+# View top variables
+cat("\nLinear Model variables:\n", lm_vars)
+```
+
+The linear regression model achieved an RMSE of **9.84** on the test set, indicating that predicted exam scores deviate from actual values by approximately 10 points on average. Among all predictors, **study hours** emerged as the most influential variable, followed by **class attendance**, highlighting the importance of consistent study behavior and engagement. Several categorical factors also played meaningful roles, particularly **good sleep quality**, **coaching-based study methods**, and **adequate sleep duration**, all of which were associated with higher exam scores. Additional contributors included **average sleep quality**, **facility rating**, and collaborative study approaches such as **group study** and **mixed methods**, though with smaller effects. Overall, the model captures the primary academic and environmental factors affecting exam performance, serving as a strong and interpretable baseline.
+
+### Random Forest
+
+```{r RF, fig.width=10, fig.height=8, echo=TRUE}
+# Reproducibility
+set.seed(123)
+
+# Fit model
+rf_r <- randomForest(
+  formula = exam_score ~ ., # Predictor + variables
+  data = train_df, # training data
+  ntree = 1000, # Number trees
+  importance = TRUE, # Calculate importance
+  nodesize = 10 # Min number of observations
+  )
+
+# Predict model
+rf_pred <- predict(rf_r, newdata = x_test, type = "response")
+rf_pred <- as.data.frame(rf_pred)
+
+# Calculate Metrics
+rf_rmse <- rmse(actual = y_test, predicted = rf_pred$rf_pred)
+cat("RMSE of  Random Forest:", rf_rmse)
+
+# Plot
+varImpPlot(rf_r)
+
+# Extract importance matrix
+imp <- importance(rf_r)
+
+# Convert to data frame
+imp_df <- data.frame(
+  variable = rownames(imp),
+  importance = imp[, 1] # %IncMSE for regression
+)
+
+# Sort descending
+imp_df <- imp_df[order(-imp_df$importance), ]
+rf_vars <- head(imp_df$variable, 10)
+
+# View top variables
+cat("\nRandom Forest Model variables:\n", rf_vars)
+```
+
+The random forest model achieved an RMSE of **10.07** on the test set, indicating an average prediction error of approximately 12 exam score points. As with the linear model, **study hours** emerged as the most influential predictor, followed by **class attendance**, reinforcing the importance of consistent academic engagement. Study behaviors and learning environments also contributed meaningfully, with **coaching-based study methods**, **sleep duration**, and **sleep quality (both poor and good)** showing notable influence on exam performance. **Facility quality** and **self-study** approaches provided additional explanatory power, though to a lesser extent. Despite its ability to model non-linear relationships and interactions, the random forest slightly underperformed the linear model in this case, suggesting that the dominant relationships in the data are largely linear and well captured by simpler modeling approaches.
+
+### Gradient Boosting
+
+```{r GB, fig.width=10, fig.height=8, echo=TRUE}
+# Reproducibility
+set.seed(123)
+
+# Fit model
+gbm_r <- gbm(
+  exam_score ~ ., # Formula: predictor + variables
+  data = train_df, # Training data
+  distribution = "gaussian", # Regression
+  n.trees = 5000, # Number of iterations
+  interaction.depth = 4, # Depth of individual trees
+  shrinkage = 0.01, # Learning rate
+  cv.folds = 5, # Cross-validation folds,
+  n.cores = 1 
+  )
+
+# Predict model
+gbm_pred <- predict(gbm_r, newdata = x_test, type = "response", n.trees = gbm_r$n.trees)
+gbm_pred <- as.data.frame(gbm_pred)
+
+# Calculate metrics
+gbm_rmse <- rmse(actual = y_test, predicted = gbm_pred$gbm_pred)
+cat("RMSE of  Gradient Boosting:", gbm_rmse)
+
+# Plot feature importance
+summary(gbm_r)
+
+# Get variables
+gbm_var <- summary(gbm_r, plotit = FALSE, order = TRUE)
+gbm_vars <- head(gbm_var$var, 10)
+
+# View top variables
+cat("\nGradient Boosting Model variables:\n", gbm_vars)
+```
+
+The gradient boosting model achieved an RMSE of **9.87** on the test set, indicating an average prediction error of just under 10 exam score points and performance comparable to the linear regression baseline. The model identified **study hours** as the most influential predictor by a wide margin, followed by **class attendance** and **sleep duration**, highlighting the importance of consistent academic effort and rest. Several behavioral and environmental factors also contributed meaningfully, including **coaching-based study methods**, **sleep quality**, and **facility rating**, while age played a minor role. Despite its ability to capture non-linear effects and higher-order interactions, gradient boosting did not substantially outperform the linear model, suggesting that the dominant relationships in the data are largely additive and well approximated by simpler modeling approaches.
+
+### XGBoosting
+
+```{r XGB, fig.width=10, fig.height=8, echo=TRUE}
+# Reproducibility
+set.seed(123)
+
+# Prepare data matrices
+train_matrix <- as.matrix(train_df[,-31])
+test_matrix <- as.matrix(test_df[,-31])
+train_label <- train_df$exam_score
+test_label <- test_df$exam_score
+
+# Fit model
+xgb_r <- xgboost(
+  x = train_matrix, # training data
+  y = train_label, # predicting variable
+  nrounds = 100, # number of iterations
+  max_depth = 4, # depth of boosting
+  learning_rate = 0.1, # learning rate
+  objective = "reg:squarederror" # Regression
+  )
+
+# Predictions
+xgb_pred <- predict(xgb_r, test_matrix, type = "response")
+xgb_pred <- as.data.frame(xgb_pred)
+
+# Calculate metrics
+xgb_rmse <- rmse(actual = y_test, predicted = xgb_pred$xgb_pred)
+cat("RMSE of  XGBoosting:", xgb_rmse)
+
+# Plot feature importance
+importance <- xgb.importance(feature_names = colnames(train_matrix), model = xgb_r)
+xgb.plot.importance(importance_matrix = importance)
+
+# Get variables
+xgb_vars <- head(importance$Feature, 10)
+
+# View top variables
+cat("\nXGBoost Model variables:\n", xgb_vars)
+```
+
+The XGBoost regression model achieved an RMSE of **9.89** on the test set, corresponding to an average prediction error of approximately 10 exam score points. Consistent with the other modeling approaches, **study hours** was the most influential predictor, followed by **class attendance**, reinforcing the central role of sustained academic engagement in exam performance. Study behaviors and well-being factors, including **coaching-based study methods**, **sleep quality**, and **sleep duration**, contributed meaningfully to the model’s predictions, while **facility rating** and **alternative study approaches** provided additional explanatory power. Overall, the XGBoost model captured non-linear patterns and interactions in the data but delivered performance similar to the linear and gradient boosting models, suggesting that the underlying relationships are largely additive and dominated by a small set of key predictors.
+
+## Model Evaluation
+
+Finally, we will compare all the models' accuracy with the calculated **RMSE** into a combined dataframe for easy comparison and I will share my final thoughts on the models performance of predicting student exam scores.
+
+```{r model comparison, echo=TRUE}
+# Table of metrics
+results_df <- data.frame(
+  Model = c("Linear Regression", "Random Forest", "Gradient Boosting", "XGBoosting"),
+  RMSE = c(round(lm_rmse, 2), round(rf_rmse, 2), round(gbm_rmse, 2), round(xgb_rmse, 2))
+)
+
+## Save table
+write.csv(
+  results_df, "C:/Users/joshp/OneDrive/Documents/Kaggle/projects/exam-score-prediction/results/results.csv"
+)
+
+## view table
+print(results_df)
+
+# Table of variables
+vars_df <- data.frame(
+  Model = c("Linear Regression", "Random Forest", "Gradient Boosting", "XGBoost"),
+  Variables = c(
+    paste(lm_vars, collapse = ", "),
+    paste(rf_vars, collapse = ", "),
+    paste(gbm_vars, collapse = ", "),
+    paste(xgb_vars, collapse = ", ")
+  ),
+  stringsAsFactors = FALSE
+)
+
+print(vars_df)
+```
+
+## Conclusion
+
+Based on the results of the predictive modeling, all four models performed reasonably well in predicting exam scores, with RMSE values ranging from 9.84 to 10.07. The **linear regression** model achieved the lowest **RMSE (9.84)**, closely followed by **gradient boosting (9.87)** and **XGBoosting (9.89)**, while the **random forest** model had the highest **RMSE (10.07)**. This suggests that simpler linear models can perform comparably to more complex ensemble methods on this dataset, likely due to the strong linear relationships between key predictors, particularly study hours and class attendance, and the target variable, exam score.
+
+Examining the top contributing variables across the models reveals a consistent set of important predictors. **Study hours** and **class attendance** are the most influential factors in all models, highlighting the critical role of dedicated preparation and consistent attendance in determining student performance. Other frequently important variables include **sleep quality**, **study method**, and **facility rating**, indicating that both personal habits and learning environment impact exam outcomes. Overall, while ensemble models like **gradient boosting** and **XGBoost** offer slightly more flexibility, **linear regression** captures the primary relationships efficiently, making it a strong and interpretable choice for this dataset.
