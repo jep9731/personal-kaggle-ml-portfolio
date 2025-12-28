@@ -1,0 +1,16 @@
+# Data manipulation
+tidyverse
+
+# Data splitting and preprocessing
+caret
+
+# Modeling
+randomForest
+gbm
+xgboost
+
+# Metrics and evaluation
+janitor
+GGally
+Metrics
+corrplot
