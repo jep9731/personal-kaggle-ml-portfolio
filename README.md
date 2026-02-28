@@ -164,7 +164,7 @@ Full technical details, notebooks, results, and evaluations are available inside
 
 ---
 
-## 🧬 Symptoms → Disease Classification (Medical NLP)
+## 🧬 Symptoms → Disease Classification (Medical NLP) - In progress
 
 **Problem:** Predict diagnosed disease from reported patient symptoms
 
@@ -223,7 +223,7 @@ Full technical details, notebooks, results, and evaluations are available inside
 
 ---
 
-## ✈️ Airline Delay Analysis – U.S. Aviation Operations EDA
+## ✈️ Airline Delay Analysis – U.S. Aviation Operations EDA - In progress
 
 **Problem:** Analyze causes and patterns of U.S. domestic airline delays across airlines, airports, and time
 
