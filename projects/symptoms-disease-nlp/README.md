@@ -37,6 +37,34 @@ Develop a multi-class machine learning model that predicts a diagnosed disease b
     * Random Forest
     * XGBoost
 
+## 📁 Repository Structure
+
+```
+symptoms-disease-nlp/
+│
+├── README.md
+│
+├── scripts/
+│   ├── symptoms-disease-nlp.py             # Core EDA & stationarity analysis
+│   └── stock-time-series-advanced.py       # STL, ARIMA, GARCH, multivariate
+│
+├── figures/
+│   ├── high_plot.png                        # Raw highest price over time
+│   ├── resample_plot.png                    # Monthly resampled trend
+│   ├── seasonality_plot.png                 # ACF plot
+│   ├── stationarity_plot.png                # Original vs differenced series
+│   ├── moving_avg_plot.png                  # 120-day moving average
+│   ├── stl_decomposition.png                # STL trend/seasonal/residual
+│   ├── acf_pacf_differenced.png             # ACF + PACF for ARIMA order selection
+│   ├── arima_forecast.png                   # 12-month forecast vs actual
+│   ├── log_returns.png                      # Daily log return series
+│   ├── garch_volatility.png                 # Conditional volatility over time
+│   └── log_return_correlation.png           # Cross-column correlation heatmap
+│
+└── requirements/
+    └── requirements.txt
+```
+
 ## 📊 Results
 
 | Model | Accuracy | Macro F1 |
