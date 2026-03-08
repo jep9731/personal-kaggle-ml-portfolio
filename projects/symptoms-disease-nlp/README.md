@@ -43,6 +43,7 @@ Develop a multi-class machine learning model that predicts a diagnosed disease b
 |:-----:|:--------:|:--------:|
 | Naive Bayes | 0.78 | 0.75 |
 | Logistic Regression | 0.84 | 0.82 |
+| Random Forest | 0.85 | 0.83 |
 | XGBoost | 0.88 | 0.86 |
 
 ## 💡 Key Insights
