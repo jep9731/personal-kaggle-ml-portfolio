@@ -14,6 +14,7 @@ This repository emphasizes **clear problem framing**, **exploratory analysis**, 
 | Breast Cancer Diagnostic | Healthcare | Binary Classification | Model Evaluation, Scaling |
 | Airline Delay Analysis | Transportation / Aviation Analytics | EDA & Time-Series Analysis | Large-Scale EDA, Time-Series Trends, Data Visualization |
 | Exam Score Prediction | Education / Analytics | Regression | EDA, Feature Engineering, Model Interpretation |
+| Microsoft Stock Analysis | Finance / Stock Market | Time Series Analysis | STL, ARIMA, GARCH, Stationarity, Volatility Modeling |
 
 ## 📂 Repository Structure
 ```
@@ -98,6 +99,26 @@ personal-kaggle-ml-portfolio/
 | | └── requirements/
 | |   └── requirements.txt
 | |
+| ├── microsoft-stock-time-series/
+│ │ ├── README.md
+│ │ ├── scripts/
+│ │ │ └── stock-time-series-analysis.py
+│ │ │ └── stock-time-series-advanced.py
+│ │ ├── figures/
+| | | └── high_plot.png
+| | | └── resample_plot.png
+| | | └── seasonality_plot.png
+| | | └── stationarity_plot.png
+| | | └── moving_avg_plot.png
+| | | └── stl_decomposition.png
+| | | └── acf_pacf_differenced.png
+| | | └── arima_forecast.png
+| | | └── log_returns.png
+| | | └── garch_volatility.png
+| | | └── log_return_correlation.png
+| | └── requirements/
+| |   └── requirements.txt
+|
 └── .gitignore
 ```
 
@@ -281,3 +302,48 @@ Full technical details, notebooks, results, and evaluations are available inside
 * Demonstrates end-to-end regression workflow with interpretable insights into student success drivers.
 
 `📂 projects/exam-score-prediction/`
+
+---
+
+## 📈 Microsoft Stock – Time Series Analysis
+
+**Problem:** Analyze and model Microsoft (MSFT) daily stock price behavior from 2015 to 2021
+
+**Type:** Time Series Analysis
+
+**Domain:** Finance / Stock Market Analytics
+
+**Techniques Used**
+
+* Trend visualization and monthly resampling of daily OHLCV data
+* Stationarity testing using the Augmented Dickey-Fuller (ADF) test
+* First differencing to achieve stationarity (d=1 confirmed)
+* Autocorrelation (ACF) and Partial Autocorrelation (PACF) analysis
+* 120-day moving average smoothing
+* STL decomposition into trend, seasonal, and residual components
+* ARIMA(1,1,1) forecasting with 12-month holdout evaluation
+* GARCH(1,1) volatility modeling to capture volatility clustering
+* Log return computation and cross-column correlation analysis
+* Granger Causality test (Volume → High price)
+
+**Evaluation Metrics**
+
+* ADF test statistic and p-value (stationarity)
+* MAE and RMSE on held-out 12-month forecast window (ARIMA)
+* Conditional volatility series (GARCH)
+
+**Key Findings**
+
+* Raw price series is non-stationary; first differencing achieves stationarity
+* ACF shows near-perfect persistence across all lags — trend dominates
+* STL confirms trend as the primary structural component
+* GARCH conditional volatility peaks sharply in March 2020 (COVID crash)
+* Granger Causality evaluated at lags 1–5 for Volume → High predictive power
+
+**Highlight**
+
+* Covers the full time series workflow from EDA to forecasting to volatility modeling.
+* Bridges classical statistical methods (ARIMA, ADF) with financial risk modeling (GARCH).
+* COVID-19 market shock is clearly visible and captured across multiple analyses.
+
+`📂 projects/microsoft-stock-time-series/`
