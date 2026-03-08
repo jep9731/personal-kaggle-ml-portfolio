@@ -1,0 +1,10 @@
+# Microsoft Stock – Time Series Analysis
+# Install with: pip install -r requirements.txt
+
+kagglehub
+pandas
+numpy
+matplotlib
+seaborn
+statsmodels
+arch
