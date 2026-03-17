@@ -15,7 +15,7 @@ This repository emphasizes **clear problem framing**, **exploratory analysis**, 
 | Airline Delay Analysis | Transportation / Aviation Analytics | EDA & Time-Series Analysis | Large-Scale EDA, Time-Series Trends, Data Visualization |
 | Exam Score Prediction | Education / Analytics | Regression | EDA, Feature Engineering, Model Interpretation |
 | Microsoft Stock Analysis | Finance / Stock Market | Time Series Analysis | STL, ARIMA, GARCH, Stationarity, Volatility Modeling |
-| Time Series Analysis | Finance / Stock Market | Time Series Analysis | ARIMA, GARCH, Stationarity, Volatility Modeling |
+| Time Series Analysis | Finance | Time Series Analysis | ARIMA, GARCH, Stationarity, Volatility Modeling |
 
 ## 📂 Repository Structure
 ```
