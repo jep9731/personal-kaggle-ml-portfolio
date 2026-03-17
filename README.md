@@ -15,6 +15,7 @@ This repository emphasizes **clear problem framing**, **exploratory analysis**, 
 | Airline Delay Analysis | Transportation / Aviation Analytics | EDA & Time-Series Analysis | Large-Scale EDA, Time-Series Trends, Data Visualization |
 | Exam Score Prediction | Education / Analytics | Regression | EDA, Feature Engineering, Model Interpretation |
 | Microsoft Stock Analysis | Finance / Stock Market | Time Series Analysis | STL, ARIMA, GARCH, Stationarity, Volatility Modeling |
+| Time Series Analysis | Finance / Stock Market | Time Series Analysis | ARIMA, GARCH, Stationarity, Volatility Modeling |
 
 ## 📂 Repository Structure
 ```
@@ -118,7 +119,26 @@ personal-kaggle-ml-portfolio/
 | | | └── log_return_correlation.png
 | | └── requirements/
 | |   └── requirements.txt
-|
+| |
+| ├── time-series-analysis/
+│ │ ├── README.md
+│ │ ├── scripts/
+│ │ │ └── stock-time-series-analysis.py
+│ │ │ └── stock-time-series-advanced.py
+│ │ ├── figures/
+| | | └── high_plot.png
+| | | └── resample_plot.png
+| | | └── seasonality_plot.png
+| | | └── stationarity_plot.png
+| | | └── moving_avg_plot.png
+| | | └── stl_decomposition.png
+| | | └── acf_pacf_differenced.png
+| | | └── arima_forecast.png
+| | | └── log_returns.png
+| | | └── garch_volatility.png
+| | | └── log_return_correlation.png
+| | └── requirements/
+| |   └── requirements.txt
 └── .gitignore
 ```
 
