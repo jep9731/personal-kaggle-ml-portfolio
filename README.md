@@ -9,7 +9,6 @@ This repository emphasizes **clear problem framing**, **exploratory analysis**, 
 | Project | Domain | Problem Type | Key Skills |
 |:-------:|:-------:|:------------:|:-----------:|
 | Stroke Prediction | Healthcare | Binary Classification | EDA, Imbalanced Data, XGBoost |
-| Symptoms → Disease NLP | Healthcare / NLP | Multi-Class Classification | TF-IDF, NLP, ML Pipelines |
 | House Prices | Real Estate | Regression | Feature Engineering, Ensembles |
 | Breast Cancer Diagnostic | Healthcare | Binary Classification | Model Evaluation, Scaling |
 | Airline Delay Analysis | Transportation / Aviation Analytics | EDA & Time-Series Analysis | Large-Scale EDA, Time-Series Trends, Data Visualization |
@@ -38,16 +37,6 @@ personal-kaggle-ml-portfolio/
 | | | └── model_comparisons_roc.png
 │ │ └── requirements/
 | |   └── requirements.txt
-│ │
-│ ├── symptoms-disease-nlp/
-│ │ ├── README.md
-│ │ ├── data/
-│ │ │ └── 01_text_eda.ipynb
-│ │ │ └── 02_feature_engineering.ipynb
-│ │ │ └── 03_multiclass_models.ipynb
-│ │ └── results/
-│ │   └── classification_report.txt
-│ │   └── confusion_matrix.png
 │ │
 │ └── house-prices-regression/
 │ | ├── README.md
@@ -205,34 +194,6 @@ Full technical details, notebooks, results, and evaluations are available inside
 
 ---
 
-## 🧬 Symptoms → Disease Classification (Medical NLP) - In progress
-
-**Problem:** Predict diagnosed disease from reported patient symptoms
-
-**Type:** Multi-Class Classification (30 diseases)
-
-**Domain:** Medical NLP / Healthcare
-
-**Techniques Used**
-
-* Text preprocessing and normalization
-* TF-IDF feature extraction
-* Multinomial Naive Bayes, Logistic Regression, XGBoost
-
-**Evaluation Metrics**
-
-* Accuracy
-* Macro F1-score
-
-**Highlight**
-
-* Effectively modeled symptom–disease relationships
-* Demonstrates applied NLP and multi-class classification skills
-
-`📂 projects/symptoms-disease-nlp/`
-
----
-
 ## 🧠 Breast cancer (Healthcare)
 
 **Problem:** Classify breast tumors as **benign or malignant** cancer.
@@ -367,3 +328,48 @@ Full technical details, notebooks, results, and evaluations are available inside
 * COVID-19 market shock is clearly visible and captured across multiple analyses.
 
 `📂 projects/microsoft-stock-time-series/`
+
+---
+
+## 📈 Time Series Analysis
+
+**Problem:** TBF
+
+**Type:** Time Series Analysis
+
+**Domain:** Finance / Stock Market Analytics
+
+**Techniques Used**
+
+* Trend visualization and monthly resampling of daily OHLCV data
+* Stationarity testing using the Augmented Dickey-Fuller (ADF) test
+* First differencing to achieve stationarity (d=1 confirmed)
+* Autocorrelation (ACF) and Partial Autocorrelation (PACF) analysis
+* 120-day moving average smoothing
+* STL decomposition into trend, seasonal, and residual components
+* ARIMA(1,1,1) forecasting with 12-month holdout evaluation
+* GARCH(1,1) volatility modeling to capture volatility clustering
+* Log return computation and cross-column correlation analysis
+* Granger Causality test (Volume → High price)
+
+**Evaluation Metrics**
+
+* ADF test statistic and p-value (stationarity)
+* MAE and RMSE on held-out 12-month forecast window (ARIMA)
+* Conditional volatility series (GARCH)
+
+**Key Findings**
+
+* Raw price series is non-stationary; first differencing achieves stationarity
+* ACF shows near-perfect persistence across all lags — trend dominates
+* STL confirms trend as the primary structural component
+* GARCH conditional volatility peaks sharply in March 2020 (COVID crash)
+* Granger Causality evaluated at lags 1–5 for Volume → High predictive power
+
+**Highlight**
+
+* Covers the full time series workflow from EDA to forecasting to volatility modeling.
+* Bridges classical statistical methods (ARIMA, ADF) with financial risk modeling (GARCH).
+* COVID-19 market shock is clearly visible and captured across multiple analyses.
+
+`📂 projects/time-series-analysis-ml/`
