@@ -142,7 +142,7 @@ personal-kaggle-ml-portfolio/
 │ │ | └── results.csv
 | | └── requirements/
 | |   └── requirements.txt
-│
+│ |
 └── .gitignore
 ```
 
