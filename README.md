@@ -15,6 +15,7 @@ This repository emphasizes **clear problem framing**, **exploratory analysis**, 
 | Exam Score Prediction | Education / Analytics | Regression | EDA, Feature Engineering, Model Interpretation |
 | Microsoft Stock Analysis | Finance / Stock Market | Time Series Analysis | STL, ARIMA, GARCH, Stationarity, Volatility Modeling |
 | Time Series Analysis | Finance | Time Series Analysis | ARIMA, GARCH, Stationarity, Volatility Modeling |
+| Symptom Disease Classification | Healthcare / NLP | Multi-Class Text Classification | TF-IDF, NB, SVM, Bidirectional LSTM, RNN |
 
 ## 📂 Repository Structure
 ```
@@ -128,6 +129,20 @@ personal-kaggle-ml-portfolio/
 | | | └── log_return_correlation.png
 | | └── requirements/
 | |   └── requirements.txt
+| |
+| ├── symptom-disease-classification/
+│ │ ├── README.md
+│ │ ├── notebooks/
+│ │ │ └── symptom-disease-nlp.ipynb
+│ │ ├── figures/
+| | | └── rnn_training_accuracy.png
+| | | └── rnn_training_loss.png
+| | | └── model_comparison.png
+│ │ ├── results/
+│ │ | └── results.csv
+| | └── requirements/
+| |   └── requirements.txt
+│
 └── .gitignore
 ```
 
@@ -373,3 +388,39 @@ Full technical details, notebooks, results, and evaluations are available inside
 * COVID-19 market shock is clearly visible and captured across multiple analyses.
 
 `📂 projects/time-series-analysis-ml/`
+
+---
+
+## 🏥 Symptom Disease Classification – NLP Text Classification
+ 
+**Problem:** Classify patient diseases based on symptom profiles using NLP and deep learning techniques
+ 
+**Type:** Multi-Class Text Classification
+ 
+**Domain:** Healthcare / NLP
+ 
+**Techniques Used**
+ 
+* Binary symptom feature matrix construction from 132 structured symptom columns
+* Symptom-to-text conversion for sequence modeling (e.g., `"itching fever nodal skin eruptions"`)
+* Multinomial Naive Bayes on binary feature vectors
+* Support Vector Machine (SVM) with linear kernel
+* Bidirectional LSTM RNN with TextVectorization embedding layer
+* Early stopping and dropout regularization for RNN training
+* Label encoding for multi-class target with `LabelEncoder`
+* Model comparison via weighted precision, recall, and F1 score
+ 
+**Evaluation Metrics**
+ 
+* Precision (weighted)
+* Recall (weighted)
+* F1 Score (weighted)
+* Per-class `classification_report`
+ 
+**Highlight**
+ 
+* Compares traditional NLP (NB, SVM) against a modern deep learning approach (Bidirectional LSTM) on the same classification task.
+* Demonstrates full NLP pipeline: feature extraction → vectorization → modeling → evaluation.
+* Highlights the importance of dataset quality in NLP — an initial synthetic dataset with low symptom-disease signal was identified and replaced through diagnostic analysis.
+ 
+`📂 projects/symptom-disease-classification/`
