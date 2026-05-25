@@ -11,7 +11,6 @@ This repository emphasizes **clear problem framing**, **exploratory analysis**, 
 | Stroke Prediction | Healthcare | Binary Classification | EDA, Imbalanced Data, XGBoost |
 | House Prices | Real Estate | Regression | Feature Engineering, Ensembles |
 | Breast Cancer Diagnostic | Healthcare | Binary Classification | Model Evaluation, Scaling |
-| Airline Delay Analysis | Transportation / Aviation Analytics | EDA & Time-Series Analysis | Large-Scale EDA, Time-Series Trends, Data Visualization |
 | Exam Score Prediction | Education / Analytics | Regression | EDA, Feature Engineering, Model Interpretation |
 | Microsoft Stock Analysis | Finance / Stock Market | Time Series Analysis | STL, ARIMA, GARCH, Stationarity, Volatility Modeling |
 | Time Series Analysis | Finance | Time Series Analysis | ARIMA, GARCH, Stationarity, Volatility Modeling |
@@ -66,17 +65,6 @@ personal-kaggle-ml-portfolio/
 | | | └── model_comparisons.png
 │ │ ├── results/
 │ │ | └── results.csv
-| | └── requirements/
-| |   └── requirements.txt
-| | 
-| ├── airline-delay-analysis/
-│ │ ├── README.md
-│ │ ├── data/
-│ │ │ └── Airline_Delay_Cause.csv
-| | ├── dashboard/
-│ | | └──airline_delay_dashboard.Rmd
-│ │ ├── notebooks/
-│ │ | └── exploratory_analysis.R
 | | └── requirements/
 | |   └── requirements.txt
 | |
