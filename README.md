@@ -13,7 +13,6 @@ This repository emphasizes **clear problem framing**, **exploratory analysis**, 
 | Breast Cancer Diagnostic | Healthcare | Binary Classification | Model Evaluation, Scaling |
 | Exam Score Prediction | Education / Analytics | Regression | EDA, Feature Engineering, Model Interpretation |
 | Microsoft Stock Analysis | Finance / Stock Market | Time Series Analysis | STL, ARIMA, GARCH, Stationarity, Volatility Modeling |
-| Time Series Analysis | Finance | Time Series Analysis | ARIMA, GARCH, Stationarity, Volatility Modeling |
 | Symptom Disease Classification | Healthcare / NLP | Multi-Class Text Classification | TF-IDF, NB, SVM, Bidirectional LSTM, RNN |
 
 ## 📂 Repository Structure
@@ -79,26 +78,6 @@ personal-kaggle-ml-portfolio/
 | |   └── requirements.txt
 | |
 | ├── microsoft-stock-time-series/
-│ │ ├── README.md
-│ │ ├── scripts/
-│ │ │ └── stock-time-series-analysis.py
-│ │ │ └── stock-time-series-advanced.py
-│ │ ├── figures/
-| | | └── high_plot.png
-| | | └── resample_plot.png
-| | | └── seasonality_plot.png
-| | | └── stationarity_plot.png
-| | | └── moving_avg_plot.png
-| | | └── stl_decomposition.png
-| | | └── acf_pacf_differenced.png
-| | | └── arima_forecast.png
-| | | └── log_returns.png
-| | | └── garch_volatility.png
-| | | └── log_return_correlation.png
-| | └── requirements/
-| |   └── requirements.txt
-| |
-| ├── time-series-analysis/
 │ │ ├── README.md
 │ │ ├── scripts/
 │ │ │ └── stock-time-series-analysis.py
@@ -228,38 +207,6 @@ Full technical details, notebooks, results, and evaluations are available inside
 
 ---
 
-## ✈️ Airline Delay Analysis – U.S. Aviation Operations EDA - In progress
-
-**Problem:** Analyze causes and patterns of U.S. domestic airline delays across airlines, airports, and time
-
-**Type:** Exploratory Data Analysis / Time-Series Analysis
-
-**Domain:** Transportation Analytics / Aviation
-
-**Techniques Used**
-
-* Large-scale EDA on 20 years of airline delay data (2003–2022).
-* Time-series analysis of delay trends by month and year.
-* Aggregation and comparison across airlines and airports.
-* Breakdown of delay causes (carrier, weather, NAS, security, late aircraft).
-* Data visualization for operational and reliability insights.
-
-**Key Insights Explored**
-
-* Which airlines and airports are most delay-prone.
-* How delay causes shift seasonally and over time.
-* Dominant contributors to total delay minutes.
-* Reliability comparisons across carriers and hubs.
-
-**Highlight**
-
-* Demonstrates real-world analytics on a 42MB operational dataset.
-* Strong emphasis on storytelling, trends, and actionable aviation insights.
-
-`📂 projects/airline-delay-analysis/`
-
----
-
 ## 🎓 Exam Score Prediction – Student Performance Analytics (Kaggle)
 
 **Problem:** Predict student exam scores based on academic behavior, lifestyle habits, and learning environment factors
@@ -331,51 +278,6 @@ Full technical details, notebooks, results, and evaluations are available inside
 * COVID-19 market shock is clearly visible and captured across multiple analyses.
 
 `📂 projects/microsoft-stock-time-series/`
-
----
-
-## 📈 Time Series Analysis
-
-**Problem:** TBF
-
-**Type:** Time Series Analysis
-
-**Domain:** Finance / Stock Market Analytics
-
-**Techniques Used**
-
-* Trend visualization and monthly resampling of daily OHLCV data
-* Stationarity testing using the Augmented Dickey-Fuller (ADF) test
-* First differencing to achieve stationarity (d=1 confirmed)
-* Autocorrelation (ACF) and Partial Autocorrelation (PACF) analysis
-* 120-day moving average smoothing
-* STL decomposition into trend, seasonal, and residual components
-* ARIMA(1,1,1) forecasting with 12-month holdout evaluation
-* GARCH(1,1) volatility modeling to capture volatility clustering
-* Log return computation and cross-column correlation analysis
-* Granger Causality test (Volume → High price)
-
-**Evaluation Metrics**
-
-* ADF test statistic and p-value (stationarity)
-* MAE and RMSE on held-out 12-month forecast window (ARIMA)
-* Conditional volatility series (GARCH)
-
-**Key Findings**
-
-* Raw price series is non-stationary; first differencing achieves stationarity
-* ACF shows near-perfect persistence across all lags — trend dominates
-* STL confirms trend as the primary structural component
-* GARCH conditional volatility peaks sharply in March 2020 (COVID crash)
-* Granger Causality evaluated at lags 1–5 for Volume → High predictive power
-
-**Highlight**
-
-* Covers the full time series workflow from EDA to forecasting to volatility modeling.
-* Bridges classical statistical methods (ARIMA, ADF) with financial risk modeling (GARCH).
-* COVID-19 market shock is clearly visible and captured across multiple analyses.
-
-`📂 projects/time-series-analysis-ml/`
 
 ---
 
